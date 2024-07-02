@@ -1,0 +1,5 @@
+mysql-connector-python==9.0.0
+numpy==2.0.0
+opencv_python==4.10.0.82
+pygame==2.5.2
+flask==3.0.3

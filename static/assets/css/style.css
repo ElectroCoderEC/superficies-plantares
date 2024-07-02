@@ -16521,3 +16521,72 @@ font-weight: bold;
   margin-right: 30px;
 
 }
+
+
+
+/* Style the button */
+.button1-index {
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 25px;
+font-weight: bold;
+  transition: transform .2s; /* Animation */
+  
+}
+
+.button1-index:hover {
+  background-color: #3e8e41;
+  transform: scale(1.2);
+}
+
+
+/* Style the button */
+.button2-index {
+  background-color: #104485;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 25px;
+font-weight: bold;
+  transition: transform .2s; /* Animation */
+  
+}
+
+.button2-index:hover {
+  background-color: #2771CF;
+  transform: scale(1.2);
+}
+
+
+/* Add a background image to the body */
+.index-body {
+
+  font-family: sans-serif;
+  text-align: center; /* Center the content horizontally */
+  background-image: 
+linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+url("../images/fondo2.png");
+  background-size: 100% 100%; /* cover the entire page */
+  background-repeat: no-repeat; /* don't repeat the image */
+  background-attachment: fixed; /* fix the background image */
+
+}
+
+/* Style the container box */
+.container1 {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
