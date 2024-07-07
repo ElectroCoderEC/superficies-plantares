@@ -3,10 +3,10 @@
 /*=============================================
 SUBIENDO LA FOTO DEL USUARIO
 =============================================*/
-$(".nuevaFoto").change(function () {
+$("#nuevaFoto").change(function () {
 
 	var imagen = this.files[0];
-
+	console.log(imagen)
 	/*=============================================
 		VALIDAMOS EL FORMATO DE LA IMAGEN SEA JPG O PNG
 		=============================================*/
@@ -14,8 +14,10 @@ $(".nuevaFoto").change(function () {
 	if (imagen["type"] != "image/jpeg" && imagen["type"] != "image/png") {
 
 		$(".nuevaFoto").val("");
+		$('#modalAgregarUsuario').modal('hide'); // Cierra el modal
 
-		swal({
+
+		Swal.fire({
 			title: "Error al subir la imagen",
 			text: "¡La imagen debe estar en formato JPG o PNG!",
 			type: "error",
@@ -23,10 +25,12 @@ $(".nuevaFoto").change(function () {
 		});
 
 	} else if (imagen["size"] > 2000000) {
+		$('#modalAgregarUsuario').modal('hide'); // Cierra el modal
+
 
 		$(".nuevaFoto").val("");
 
-		swal({
+		Swal.fire({
 			title: "Error al subir la imagen",
 			text: "¡La imagen no debe pesar más de 2MB!",
 			type: "error",
@@ -38,15 +42,31 @@ $(".nuevaFoto").change(function () {
 		var datosImagen = new FileReader;
 		datosImagen.readAsDataURL(imagen);
 
+
+
+
 		$(datosImagen).on("load", function (event) {
 
 			var rutaImagen = event.target.result;
 
+
 			$(".previsualizar").attr("src", rutaImagen);
+
+
 
 		})
 
 	}
+})
+
+
+
+$(".previsualizar").change(function () {
+
+	var url = $(this).attr("src");
+	console.log('URL de la imagen del elemento img:', url);
+
+
 })
 
 /*=============================================
@@ -94,79 +114,7 @@ $(".tablas").on("click", ".btnEditarUsuario", function () {
 
 })
 
-/*=============================================
-ACTIVAR USUARIO
-=============================================*/
-$(".tablas").on("click", ".btnActivar", function () {
 
-
-
-	var idUsuario = $(this).attr("idUsuario");
-	var estadoUsuario = $(this).attr("estadoUsuario");
-
-	var datos = new FormData();
-	datos.append("activarId", idUsuario);
-	datos.append("activarUsuario", estadoUsuario);
-
-	$.ajax({
-
-		url: "ajax/usuarios.ajax.php",
-		method: "POST",
-		data: datos,
-		cache: false,
-		contentType: false,
-		processData: false,
-		success: function (respuesta) {
-
-
-
-
-			if (window.matchMedia("(max-width:767px)").matches) {
-
-
-
-				swal({
-					title: "El usuario ha sido actualizado",
-					type: "success",
-					confirmButtonText: "¡Cerrar!"
-				}).then(function (result) {
-
-
-
-					if (result.value) {
-
-
-
-						window.location = "usuarios";
-
-					}
-
-
-				});
-
-			}
-
-		}
-
-	})
-
-	if (estadoUsuario == 0) {
-
-		$(this).removeClass('btn-success');
-		$(this).addClass('btn-danger');
-		$(this).html('Desactivado');
-		$(this).attr('estadoUsuario', 1);
-
-	} else {
-
-		$(this).addClass('btn-success');
-		$(this).removeClass('btn-danger');
-		$(this).html('Activado');
-		$(this).attr('estadoUsuario', 0);
-
-	}
-
-})
 
 /*=============================================
 REVISAR SI EL USUARIO YA ESTÁ REGISTRADO
@@ -194,7 +142,6 @@ $("#nuevoUsuario").change(function () {
 			if (respuesta) {
 
 				$("#nuevoUsuario").parent().after('<div class="alert alert-warning">Este usuario ya existe en la base de datos</div>');
-
 				$("#nuevoUsuario").val("");
 
 			}
@@ -203,6 +150,48 @@ $("#nuevoUsuario").change(function () {
 
 	})
 })
+
+
+
+/*=============================================
+SELECCIONAR USUARIO
+=============================================*/
+$(".tablas").on("click", ".btnElegirUsuario", function () {
+
+	var idUsuario = $(this).attr("idUsuario");
+
+	Swal.fire({
+		title: '¿Desea iniciar la prueba con este usuario?',
+		text: "¡Si no lo está puede cancelar la accíón!",
+		type: 'warning',
+		showCancelButton: true,
+		confirmButtonColor: '#3085d6',
+		cancelButtonColor: '#d33',
+		cancelButtonText: 'Cancelar',
+		confirmButtonText: 'OK'
+	}).then(function (result) {
+
+		if (result.value) {
+
+
+			$.ajax({
+				url: '/select_user',
+				type: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify({ idUsuario: idUsuario }),
+				success: function (response) {
+					if (response.redirect) {
+						window.location.href = response.redirect + "?usuario=" + JSON.stringify(response.usuario);  //esto es con GET
+						//window.location.href = response.usuario;
+					} else {
+						console.log("Error: Redirección no especificada.");
+					}
+				}
+			});
+		}
+	})
+})
+
 
 /*=============================================
 ELIMINAR USUARIO
@@ -258,5 +247,38 @@ $(".tablas").on("click", ".btnEliminarUsuario", function () {
 })
 
 
+
+
+$('#userForm input').on("change", function () {
+	console.log($(this).attr('value')); // based on the value do something.
+
+	var dato = $(this).attr('value');
+
+	if (dato == "masculino") {
+
+		$(".previsualizar").attr("src", "../assets/images/hombre.png");
+
+		// Asigna la ruta al input file
+		$('#nuevaFotoOculta').val("../assets/images/hombre.png");
+
+
+
+	}
+	else if (dato == "femenino") {
+
+		$(".previsualizar").attr("src", "../assets/images/mujer.png");
+
+		$('#nuevaFotoOculta').val("../assets/images/mujer.png");
+
+	}
+
+	// Redimensionar la imagen a 512x512 píxeles
+	$(".previsualizar").css({
+		width: "80px",
+		height: "80px",
+		objectFit: "cover" // Mantener la relación de aspecto de la imagen
+	});
+
+});
 
 

@@ -14,12 +14,9 @@ audio = Reproductor()
 malcolocado = 0
 factor = 12.3
 
-
 # Crear un hilo para la reproducción de audio
 # audio_thread = threading.Thread(target=play_audio1)
 # audio_thread.start()
-
-pseudo_color = None
 
 
 # Función para calcular los puntos de una línea perpendicular
@@ -1054,8 +1051,7 @@ w = 640
 cameraMatrix, dist = pickle.load(open("static/pkl/calibration.pkl", "rb"))
 
 
-def procesamiento(img):
-
+def procesamiento(img, camera_mode):
     frame = img
     # DESCOMENTAR PARA Q FUNCIONE CAMARA
 
@@ -1119,17 +1115,37 @@ def procesamiento(img):
     # image = cv2.resize(image, (640, 480))
 
     # image = cv2.imencode(".jpg", planta)[1].tobytes()
-    return planta
+    if camera_mode == "procesada":
+        return planta
+    elif camera_mode == "mascara":
+        return mask1
+    else:
+        return frame
 
 
 class VideoCamera(object):
     def __init__(self):
 
+       
+        self.camera_mode = ""
+        self.stateCam = False
+
+    def start(self):
+        self.stateCam = True
         # Abrir la camara rapido con CAP_DSHOW
-        global pseudo_color
         self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
+    def stop(self):
+        self.stateCam = False
+        self.cap.release()
+
+    def state(self):
+        return self.stateCam
+
+    def set_mode(self, dato):
+        self.camera_mode = dato
 
     def __del__(self):
         self.cap.release()
@@ -1138,8 +1154,9 @@ class VideoCamera(object):
         success, image = self.cap.read()
         # image=cv2.resize(image,(840,640))
         if success:
-            image = procesamiento(image)
-
+            image = procesamiento(image, self.camera_mode)
         # so we must encode it into JPEG in order to correctly display the video stream.
         ret, jpeg = cv2.imencode(".jpg", image)
         return jpeg.tobytes()
+
+    

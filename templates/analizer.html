@@ -254,7 +254,7 @@
                             <li>
                                   <a href="{{url_for('dashboard')}}" class="waves-effect waves-dark">
                                       <span class="pcoded-micon"><i class="ti-home"></i><b>D</b></span>
-                                      <span class="pcoded-mtext" data-i18n="nav.dash.main">Home</span>
+                                      <span class="pcoded-mtext" data-i18n="nav.dash.main">Inicio</span>
                                       <span class="pcoded-mcaret"></span>
                                   </a>
                              
@@ -263,7 +263,7 @@
                           <div class="pcoded-navigation-label" data-i18n="nav.category.forms">Herramientas</div>
                           <ul class="pcoded-item pcoded-left-item">
                               <li>
-                                  <a href="form-elements-component.html" class="waves-effect waves-dark">
+                                  <a href="{{url_for('usuarios')}}" class="waves-effect waves-dark">
                                       <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
                                       <span class="pcoded-mtext" data-i18n="nav.form-components.main">Usuarios</span>
                                       <span class="pcoded-mcaret"></span>
@@ -292,7 +292,10 @@
                       </div>
                   </nav>
                   <div class="pcoded-content">
+              
                       <!-- Page-header start -->
+                       <!--
+                      
                       <div class="page-header">
                         <div class="page-block">
                             <div class="row align-items-center">
@@ -314,7 +317,10 @@
                             </div>
                         </div>
                     </div>
-                      <!-- Page-header end -->
+                    
+                    -->
+                    <!-- Page-header end -->
+
                         <div class="pcoded-inner-content">
                             <!-- Main-body start -->
                             <div class="main-body">
@@ -327,25 +333,121 @@
                                             <!--  sale analytics start -->
                                             <div class="col-xl-7 col-md-12">
                                                 <div class="card user-card">
-                                                    <div class="card-header">
-                                                        <img src="{{ url_for('video_feed') }}">
+                                                    
+                                                        <div class="card-header">
+                                                            <div class="row">
+                                                                <div class="col-6 ">
+                                                                    <h5 >IMAGEN ACTUAL</h5>
+                                                                </div>
+                                                                <div class="col-6" >
+                                                                   
+                                                                    <h5 >
+                                                                        <select name="select" class="tipoVideo" >
+                                                                            <option value="procesada">Imagen Procesada</option>
+                                                                            <option value="mascara">Imagen Máscara</option>
+                                                                            <option value="normal">Imagen Normal</option>
+                                                                        </select>
+                                                                    </h5>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                            
+                                                        </div>
 
-                                                        <br>
-                                                       
-                                                    </div>
+
+                                                        <img src="{{ url_for('video_feed') }}">
+                                                        
+                                                    
                                                    
                                                 </div>
 
                                                 <div class="card user-card">
                                                     <div class="card-body  text-center">
+                                                        
                                                         <div class="row">
-                                                            <div class="col-6">
-                                                                <button class="button1-index"> <i class="fa fa-home"></i>Analizar</button>
+                                                            <div class="col-md-6">
+
+                                                                <h3>Controles HSV</h3>
+                                                                <form id="hsv-form" method="POST">
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            <div class="slider-container">
+                                                                                <label for="lower-h">Lower H: <span id="lower-h-val">30</span></label>
+                                                                                <input type="range" id="lower-h" name="lower_h" min="0" max="179" value="30" class="form-control">
+                                                                            </div>
+                                                                            <div class="slider-container">
+                                                                                <label for="lower-s">Lower S: <span id="lower-s-val">16</span></label>
+                                                                                <input type="range" id="lower-s" name="lower_s" min="0" max="255" value="16" class="form-control">
+                                                                            </div>
+                                                                            <div class="slider-container">
+                                                                                <label for="lower-v">Lower V: <span id="lower-v-val">103</span></label>
+                                                                                <input type="range" id="lower-v" name="lower_v" min="0" max="255" value="103" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <div class="slider-container">
+                                                                                <label for="upper-h">Upper H: <span id="upper-h-val">94</span></label>
+                                                                                <input type="range" id="upper-h" name="upper_h" min="0" max="179" value="94" class="form-control">
+                                                                            </div>
+                                                                            <div class="slider-container">
+                                                                                <label for="upper-s">Upper S: <span id="upper-s-val">255</span></label>
+                                                                                <input type="range" id="upper-s" name="upper_s" min="0" max="255" value="255" class="form-control">
+                                                                            </div>
+                                                                            <div class="slider-container">
+                                                                                <label for="upper-v">Upper V: <span id="upper-v-val">255</span></label>
+                                                                                <input type="range" id="upper-v" name="upper_v" min="0" max="255" value="255" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                  <!--  <button type="submit" class="btn btn-primary">Submit</button>-->
+                                                                </form>
+
                                                             </div>
-                                                            <div class="col-6">
-                                                                <button class="button1-index"> <i class="fa fa-home"></i>Guardar</button>
+
+                                                            <div class="col-md-6">
+                                                                <h3>Controles HSV dedos</h3>
+                                                                <form id="hsv-dedos-form" method="POST">
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            <div class="slider-container">
+                                                                                <label for="lower-h-dedos">Lower H: <span id="lower-h-dedos-val">40</span></label>
+                                                                                <input type="range" id="lower-h-dedos" name="lower_h_dedos" min="0" max="179" value="40" class="form-control">
+                                                                            </div>
+                                                                            <div class="slider-container">
+                                                                                <label for="lower-s-dedos">Lower S: <span id="lower-s-dedos-val">16</span></label>
+                                                                                <input type="range" id="lower-s-dedos" name="lower_s_dedos" min="0" max="255" value="16" class="form-control">
+                                                                            </div>
+                                                                            <div class="slider-container">
+                                                                                <label for="lower-v-dedos">Lower V: <span id="lower-v-dedos-val">87</span></label>
+                                                                                <input type="range" id="lower-v-dedos" name="lower_v_dedos" min="0" max="255" value="87" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <div class="slider-container">
+                                                                                <label for="upper-h-dedos">Upper H: <span id="upper-h-dedos-val">100</span></label>
+                                                                                <input type="range" id="upper-h-dedos" name="upper_h_dedos" min="0" max="179" value="100" class="form-control">
+                                                                            </div>
+                                                                            <div class="slider-container">
+                                                                                <label for="upper-s-dedos">Upper S: <span id="upper-s-dedos-val">255</span></label>
+                                                                                <input type="range" id="upper-s-dedos" name="upper_s_dedos" min="0" max="255" value="255" class="form-control">
+                                                                            </div>
+                                                                            <div class="slider-container">
+                                                                                <label for="upper-v-dedos">Upper V: <span id="upper-v-dedos-val">255</span></label>
+                                                                                <input type="range" id="upper-v-dedos" name="upper_v_dedos" min="0" max="255" value="255" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                  <!-- <button type="submit" class="btn btn-primary">Submit</button>--> 
+                                                                </form>
                                                             </div>
+                                                        
                                                         </div>
+                                                       
+                                                     
+                                                           
+                                                    
+                                                           
+                                                       
                                                     </div>
                                                 </div>
 
@@ -354,38 +456,43 @@
                                             <div class="col-xl-5 col-md-8">
                                                 <div class="card user-card">
                                                     <div class="card-header">
-                                                        <h5>Perfil Usuario</h5>
+                                                        <h5>PERFIL DEL USUARIO</h5>
                                                     </div>
+                                                    {% if usuario %}
                                                     <div class="card-body  text-center">
                                                         <div class="">
-                                                            <img src="assets/images/img-round1.jpg" class="img-radius wid-80 m-auto" alt="User-Profile-Image" width="20%">
+                                                            <img src="{{ usuario[8] }}" class="img-radius " alt="User-Profile-Image" style="width: 30%;">
                                                         </div>
-                                                        <h5 class="f-w-600 m-t-25 m-b-10">Alessa Robert</h5>
-                                                        <p>0604655654</p>
-                                                      
+
+                                                        <h5 class="f-w-600 m-t-25 m-b-10">{{ usuario[1] }}</h5>
+                                                        <p>{{ usuario[2] }}</p>
+                                                       
                                                         
                                                         <div class="bg-c-blue counter-block m-t-10 p-20">
                                                             <div class="row">
                                                                 <div class="col-4">
-                                                                    <h6 class="text-white mt-2 mb-0">Edad</h6>
-                                                                    <h6 class="text-white mt-2 mb-0"></h6>
-                                                                    <i class="fa fa-calendar text-white f-20"></i>
-                                                                    <h6 class="text-white mt-2 mb-0">20</h6>
-                                                                </div>
-                                                                <div class="col-4">
                                                                     <h6 class="text-white mt-2 mb-0">Estatura</h6>
                                                                     <h6 class="text-white mt-2 mb-0"></h6>
-                                                                    <i class="fa fa-user text-white f-20"></i>
-                                                                    <h6 class="text-white mt-2 mb-0">1.75cm</h6>
+                                                                    <i class="fa fa-male text-white f-20"></i>
+                                                                    <h6 class="text-white mt-2 mb-0">{{ usuario[4] }} cm</h6>
                                                                 </div>
+                                                                <div class="col-4">
+                                                                    <h6 class="text-white mt-2 mb-0">Edad</h6>
+                                                                    <h6 class="text-white mt-2 mb-0"></h6>
+                                                                    <i class="fa fa-sort text-white f-20"></i>
+                                                                    <h6 class="text-white mt-2 mb-0">{{ usuario[5] }} años</h6>
+                                                                </div>
+                                                                
                                                                 <div class="col-4">
                                                                     <h6 class="text-white mt-2 mb-0">Peso</h6>
                                                                     <h6 class="text-white mt-2 mb-0"></h6>
-                                                                    <i class="fa fa-folder-open text-white f-20"></i>
-                                                                    <h6 class="text-white mt-2 mb-0">85 Kg</h6>
+                                                                    <i class="fa fa-list-ol text-white f-20"></i>
+                                                                    <h6 class="text-white mt-2 mb-0">{{ usuario[6] }} Kg</h6>
                                                                 </div>
                                                             </div>
                                                         </div>
+
+                                                        {% endif %}
                                                        
                                                     </div>
                                                 </div>
@@ -401,10 +508,10 @@
     
                                                             <div class="card-body  text-center">
                                                                 <div class="row">
-                                                                    <div class="col-6">
-                                                                        <img src="assets/images/plantilla.png" class="img-radius wid-80 m-auto" alt="User-Profile-Image" width="20%">                                               
+                                                                    <div class="col-6 text-center">
+                                                                        <img src="assets/images/plantilla.png" width="50%" >                                               
                                                                     </div>
-                                                                    <div class="col-6">
+                                                                    <div class="col-6 text-center">
                                                                         <h1 >0%</h1>
                                                                         <h5 >Tipo de Pie</h5>
                                                                     </div>
@@ -423,10 +530,10 @@
     
                                                             <div class="card-body  text-center">
                                                                 <div class="row">
-                                                                    <div class="col-6">
-                                                                        <img src="assets/images/plantilla.png" class="img-radius wid-80 m-auto" alt="User-Profile-Image" width="20%">                                               
+                                                                    <div class="col-6 text-center">
+                                                                        <img src="assets/images/plantilla_right.png" width="50%"  >                                               
                                                                     </div>
-                                                                    <div class="col-6">
+                                                                    <div class="col-6 text-center">
                                                                         <h1 >0%</h1>
                                                                         <h5 >Tipo de Pie</h5>
                                                                     </div>
@@ -435,13 +542,39 @@
                                                             </div>
 
                                                         </div>
-
                                                         
                                                        </div>
-                                                       
-                                                      
-                                                
                                                 </div>
+
+
+                                                <div class="card user-card">
+                                                    <div class="card-header">
+                                                        <h5>ACCIONES</h5>
+                                                    </div>
+
+                                                    <div class="card-body  text-center">
+                                                        <!-- Buttons -->
+                                                        <div class="btn-container row">
+                                                            <div class="col-md-4">
+                                                                <button type="button" class="btn btn-info btn-block">
+                                                                    <i class="fa fa-camera"></i> Capturar
+                                                                </button>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <button type="button" class="btn btn-danger btn-block">
+                                                                    <i class="fa fa-dot-circle-o"></i> Analizar
+                                                                </button>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <button type="button" class="btn btn-success btn-block">
+                                                                    <i class="fa fa-floppy-o"></i> Guardar
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
                                             </div>
 
                                           
@@ -532,8 +665,11 @@
     <script src="{{url_for('static', filename='assets/js/pcoded.min.js')}}"></script>
     <script src="{{url_for('static', filename='assets/js/vertical-layout.min.js')}}"></script>
     <!-- custom js -->
-    <script type="text/javascript" src="{{url_for('static', filename='assets/pages/dashboard/custom-dashboard.js')}}"></script>
+   <!--  <script type="text/javascript" src="{{url_for('static', filename='assets/pages/dashboard/custom-dashboard.js')}}"></script>-->
     <script type="text/javascript" src="{{url_for('static', filename='assets/js/script.js')}}" ></script>
+
+     <!-- ANALIZADOR -->    
+     <script src="{{url_for('static', filename='assets/js/analizador.js')}}"></script>
 </body>
 
 </html>

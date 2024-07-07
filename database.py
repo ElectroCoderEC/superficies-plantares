@@ -31,11 +31,30 @@ class Database:
     def fetch_users(self):
         self.connect()
         cursor = self.connection.cursor()
-        cursor.execute("SELECT * FROM usuarios")
+        cursor.execute("SELECT * FROM usuarios order by id DESC")
         users = cursor.fetchall()
         cursor.close()
         self.connection.close()
         return users
+
+    def get_user_data(self, id_cliente):
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM usuarios WHERE id = %s", (id_cliente,))
+        user = cursor.fetchone()
+        cursor.close()
+        self.connection.close()
+        return user
+
+    def get_user_cedula(self, id_cliente):
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT cedula FROM usuarios WHERE id = %s", (id_cliente,))
+        user = cursor.fetchone()
+        cursor.close()
+        self.connection.close()
+        if user:
+            return user[0]  # Return the cedula as a string
 
     def delete_user(self, id_cliente):
         self.connect()

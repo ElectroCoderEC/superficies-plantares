@@ -34,6 +34,21 @@ $(document).ready(function () {
 
 	});
 
+
+
+	$(".previsualizar").attr("src", "../assets/images/hombre.png");
+	// Redimensionar la imagen a 512x512 píxeles
+	$(".previsualizar").css({
+		width: "80px",
+		height: "80px",
+		objectFit: "cover" // Mantener la relación de aspecto de la imagen
+	});
+	var rutaImagen = "../assets/images/hombre.png";
+	// Asigna la ruta al input file
+	$('#nuevaFotoOculta').val(rutaImagen);
+
+
+
 });
 
 

@@ -266,7 +266,7 @@
                                 <a href="{{url_for('dashboard')}}" class="waves-effect waves-dark">
                                   
                                         <span class="pcoded-micon"><i class="ti-home"></i><b>D</b></span>
-                                        <span class="pcoded-mtext" data-i18n="nav.dash.main">Home</span>
+                                        <span class="pcoded-mtext" data-i18n="nav.dash.main">Inicio</span>
                                         <span class="pcoded-mcaret"></span>
                                     
                                   </a>
@@ -387,9 +387,9 @@
                                                                   <td>{{ user[6] }}</td>
                                                                   <td>{{ user[7] }}</td>
                                                                   <td> 
-                                                                    <button class="btn btn-success btnElegirrUsuario"  idUsuario="  {{  user[0] }}" title="Seleccionar"><i class="fa fa-upload"></i></button>
-                                                                    <button class="btn btn-warning btnModificarUsuario"  idUsuario="{{  user[0] }}" title="Editar"><i class="fa fa-pencil"></i></button>
-                                                                    <button class="btn btn-danger  btnEliminarUsuario"  idUsuario=" {{  user[0] }}" title="Borrar"><i class="fa fa-times"></i></button>
+                                                                    <button class="btn btn-success btnElegirUsuario"  idUsuario="  {{user[0]}}" title="Seleccionar"><i class="fa fa-upload"></i></button>
+                                                                    <button class="btn btn-warning btnModificarUsuario"  idUsuario="{{user[0]}}" title="Editar"><i class="fa fa-pencil"></i></button>
+                                                                    <button class="btn btn-danger  btnEliminarUsuario"  idUsuario=" {{user[0]}}" title="Borrar"><i class="fa fa-times"></i></button>
                                                                   </td>
 
                                                                 </tr>
@@ -433,18 +433,15 @@ MODAL AGREGAR USUARIO
           ======================================-->
   
           <div class="modal-header btn-primary">
-
             <div class="row">
-
                 <div class="col-4">
-                    <img src="assets/images/hombre.png" class="img-thumbnail previsualizar img-radius wid-80 m-auto" alt="User-Profile-Image" width="50%">
+                    <img src="assets/images/hombre.png" class="img-thumbnail previsualizar img-radius wid-80 m-auto previsualizar" alt="User-Profile-Image"  id="pic1">
                 </div>
 
-                <div class="col-6 text-center" style="display: flex; align-items: center; justify-content: center;">
-                    <h4 class="modal-title ">Registro de Usuario</h4>
+                <div class="col-6 " style="display: flex; align-items: center; justify-content: center;">
+                    <h5 class="modal-title">Registro de Usuario</h5>
                 </div>
             </div>
-  
           </div>
   
           <!--=====================================
@@ -482,7 +479,7 @@ MODAL AGREGAR USUARIO
             
                                 <div class="input-group">
                                   <span class="input-group-addon"><i class="fa fa-address-card"></i></span> 
-                                  <input type="text" class="form-control form-control-round" name="nuevoCedula" id="nuevoCedula"   required>
+                                  <input type="text" class="form-control form-control-round" name="nuevoCedula" id="nuevoCedula"  maxlength="10" minlength="10" required>
                                 </div>
                               </div>
                          </div>
@@ -499,7 +496,7 @@ MODAL AGREGAR USUARIO
             
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-phone"></i></span>         
-                                    <input type="text" class="form-control form-control-round" name="nuevoTelefono" id="nuevoTelefono"  required>
+                                    <input type="text" class="form-control form-control-round" name="nuevoTelefono" id="nuevoTelefono" maxlength="10" minlength="10" required>
                                 </div>
                             </div>
                           </div>
@@ -512,7 +509,7 @@ MODAL AGREGAR USUARIO
             
                                 <div class="input-group">
                                   <span class="input-group-addon"><i class="fa fa-male"></i></span> 
-                                  <input type="text" class="form-control form-control-round" name="nuevoEstatura" id="nuevoEstatura" required>
+                                  <input type="text" class="form-control form-control-round" name="nuevoEstatura" id="nuevoEstatura" maxlength="4" minlength="4" required>
                                 </div>
                               </div>
                          </div>
@@ -528,20 +525,20 @@ MODAL AGREGAR USUARIO
             
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-sort"></i></span>         
-                                    <input type="number" class="form-control form-control-round" name="nuevoEdad" id="nuevoEdad"  required>
+                                    <input type="number" class="form-control form-control-round" name="nuevoEdad" id="nuevoEdad"  maxlength="2" minlength="2" required>
                                 </div>
                             </div>
                           </div>
                           
             
-                        <!-- ENTRADA PARA CEDULA -->
+                        <!-- ENTRADA PARA PESO -->
                           <div class="col-6">
                             <div class="form-group">
-                                <b><label for="cedula"><i class="icon-lock"></i>Peso</label> <b></b>
+                                <b><label for="peso"><i class="icon-lock"></i>Peso</label> <b></b>
             
                                 <div class="input-group">
                                   <span class="input-group-addon"><i class="fa fa-list-ol"></i></span> 
-                                  <input type="text" class="form-control form-control-round" name="nuevoPeso" id="nuevoPeso" required>
+                                  <input type="text" class="form-control form-control-round" name="nuevoPeso" id="nuevoPeso" maxlength="3" minlength="2" required>
                                 </div>
                               </div>
                          </div>
@@ -560,8 +557,7 @@ MODAL AGREGAR USUARIO
                             </div>    
                         </div>
         
-                     
-                        <br>
+                    
                      
                       <!-- ENTRADA PARA SUBIR FOTO -->
           
@@ -569,7 +565,10 @@ MODAL AGREGAR USUARIO
                         
                         <div class="panel ">SUBIR FOTO</div>
           
-                        <input type="file" class="nuevaFoto" name="nuevaFoto">
+                       
+                        <input type="hidden" id="nuevaFotoOculta" name="nuevaFotoOculta" >
+                        <input type="file" id="nuevaFoto" name="nuevaFoto" class="form-control">
+                        
           
                         <p class="help-block">Peso máximo de la foto 2MB</p>
           
@@ -749,7 +748,7 @@ MODAL AGREGAR USUARIO
     <script src="{{url_for('static', filename='assets/js/pcoded.min.js')}}"></script>
     <script src="{{url_for('static', filename='assets/js/vertical-layout.min.js')}}"></script>
     <!-- custom js -->
-    <script type="text/javascript" src="{{url_for('static', filename='assets/pages/dashboard/custom-dashboard.js')}}"></script>
+     <!--<script type="text/javascript" src="{{url_for('static', filename='assets/pages/dashboard/custom-dashboard.js')}}"></script>-->
     <script type="text/javascript" src="{{url_for('static', filename='assets/js/script.js')}}" ></script>
 
 
