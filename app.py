@@ -3,15 +3,18 @@
 Created on Mon July 1 15:34:08 2024
 @author: sebas
 """
+# LIBRERIAS GENERALES *****************************************
 import os
 import shutil
 from flask import Flask, render_template, Response, request, redirect, jsonify
-from camera import VideoCamera
-from database import Database
-from audio import Reproductor
 import cv2
 from werkzeug.utils import secure_filename
 import json
+
+# CLASES CREADAS PROPIAS **************************************
+from camera import VideoCamera
+from database import Database
+from audio import Reproductor
 
 app = Flask(
     __name__,
@@ -32,30 +35,14 @@ video = VideoCamera()
 video.set_mode("procesada")
 
 
+# FUNCION PAGINA PRINCIPAL
 @app.route("/")
 def index():
     if video.state():
         video.set_mode("procesada")
         video.stop()
-    audio.play_bien()
+    audio.play_intro()
     return render_template("index.html")
-
-
-@app.route("/register")
-def register():
-    return render_template("register.html")
-
-
-@app.route("/analyzer", methods=["GET"])
-def analyzer():
-    usuario = request.args.get("usuario")
-    usuario = json.loads(usuario)
-
-    print(f"RECUPERADOOOO: {usuario}")
-
-    return render_template("analizer.html", usuario=usuario)
-
-    # return render_template("analizer.html")
 
 
 @app.route("/dashboard")
@@ -79,14 +66,20 @@ def usuarios():
 
     try:
         # Configuración de la conexión a la base de datos
-
         db = Database(db_config)
         users = db.fetch_users()
-
         return render_template("usuarios.html", users=users)
 
     except Exception as e:
+        audio.play_error()
         return render_template("usuarios.html", errorbase="error")
+
+
+@app.route("/analyzer", methods=["GET"])
+def analyzer():
+    usuario = request.args.get("usuario")
+    usuario = json.loads(usuario)
+    return render_template("analizer.html", usuario=usuario)
 
 
 # Ruta para manejar el envío del formulario
@@ -106,8 +99,6 @@ def submit():
         imagen = request.form["nuevaFotoOculta"]
         imagenInput = request.files["nuevaFoto"]
 
-        print("archivoooo: ", imagenInput.filename)
-
         # Crear las carpetas necesarias dentro de 'static'
         static_path = os.path.join(app.root_path, "static/usuarios")
         base_path = os.path.join(static_path, cedula)
@@ -124,7 +115,6 @@ def submit():
         os.makedirs(reportes_path, exist_ok=True)
 
         img = None
-        rutaPerfil = ""
         if (("hombre" in imagen) or ("mujer" in imagen)) and len(
             imagenInput.filename
         ) == 0:
@@ -140,7 +130,6 @@ def submit():
             cv2.imwrite(perfil_path + "/perfil.png", img)
 
         else:
-            print("si es otra foto")
 
             file = request.files["nuevaFoto"]
             if file:
@@ -163,10 +152,12 @@ def submit():
             "usuarios/" + cedula + "/fotos/perfil/perfil.png",
         )
 
+        audio.play_registro()
         return jsonify({"status": "success"})
     # return redirect("/usuarios")
 
     except Exception as err:
+        audio.play_error()
         return jsonify({"status": "error", "message": str(err)})
 
 
@@ -182,9 +173,7 @@ def select_user():
     print(f"Usuario obtenidooo: {usuario}")
 
     return jsonify({"redirect": "/analyzer", "usuario": usuario})
-
-
-# return render_template("analizer.html", usuario=usuario)
+    # return render_template("analizer.html", usuario=usuario)
 
 
 @app.route("/delete_user", methods=["POST"])
@@ -223,7 +212,6 @@ def video_stream(camera):
 
 @app.route("/video_feed")
 def video_feed():
-
     return Response(
         video_stream(video),
         mimetype="multipart/x-mixed-replace; boundary=frame",
@@ -237,6 +225,18 @@ def set_mode():
     video.set_mode(camera_mode)
     # print("EL DATO QUE LLEGA ES: ", camera_mode)
     return jsonify({"message": "Mode set to " + camera_mode})
+
+
+@app.route("/set_controles", methods=["POST"])
+def set_controles():
+    data = request.get_json()
+    tipo_control = data.get("control")
+    valor_control = data.get("valor")
+
+    video.set_hsv_val(tipo_control, valor_control)
+
+    print("TIPOOOO: " + tipo_control + "  VALOR:" + valor_control)
+    return jsonify({"message": "TIPOOOO: " + tipo_control + "  VALOR:" + valor_control})
 
 
 if __name__ == "__main__":

@@ -940,7 +940,7 @@ def detectar_contornos_planta(
         """
         print(e)
 
-    return frame, mask
+    return frame, mask, pseudo_color
 
 
 # Función para dibujar rectángulo y texto
@@ -990,7 +990,7 @@ def nothing(x):
 
 
 # Función para mostrar el mensaje de "Sin cámara"
-def mostrar_mensaje_sin_camara(self):
+def mostrar_mensaje_sin_camara():
     frame = np.zeros((480, 640, 3), dtype=np.uint8)
     cv2.putText(
         frame,
@@ -1005,6 +1005,7 @@ def mostrar_mensaje_sin_camara(self):
     return frame
 
 
+"""
 # Crear una ventana para los controles deslizantes
 cv2.namedWindow("Controles HSV", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("Controles HSV", 300, 300)
@@ -1028,6 +1029,7 @@ cv2.createTrackbar("Lower V", "Controles HSV dedos", 87, 255, nothing)
 cv2.createTrackbar("Upper H", "Controles HSV dedos", 100, 179, nothing)
 cv2.createTrackbar("Upper S", "Controles HSV dedos", 255, 255, nothing)
 cv2.createTrackbar("Upper V", "Controles HSV dedos", 255, 255, nothing)
+"""
 
 
 # DECOMENTAR PARA QUE FUNCIONE LA IMAGEN
@@ -1051,7 +1053,22 @@ w = 640
 cameraMatrix, dist = pickle.load(open("static/pkl/calibration.pkl", "rb"))
 
 
-def procesamiento(img, camera_mode):
+def procesamiento(
+    img,
+    camera_mode,
+    lower_h,
+    lower_s,
+    lower_v,
+    upper_h,
+    upper_s,
+    upper_v,
+    lower_h2,
+    lower_s2,
+    lower_v2,
+    upper_h2,
+    upper_s2,
+    upper_v2,
+):
     frame = img
     # DESCOMENTAR PARA Q FUNCIONE CAMARA
 
@@ -1072,29 +1089,35 @@ def procesamiento(img, camera_mode):
         frame = undistorted
         frame = cv2.resize(frame, (640, 480))
 
+        """
         # Obtener los valores HSV actuales de los trackbars
-        lower_h = cv2.getTrackbarPos("Lower H", "Controles HSV")
-        lower_s = cv2.getTrackbarPos("Lower S", "Controles HSV")
-        lower_v = cv2.getTrackbarPos("Lower V", "Controles HSV")
-        upper_h = cv2.getTrackbarPos("Upper H", "Controles HSV")
-        upper_s = cv2.getTrackbarPos("Upper S", "Controles HSV")
-        upper_v = cv2.getTrackbarPos("Upper V", "Controles HSV")
+        lower_h = 30
+        lower_s = 16
+        lower_v = 103
+        upper_h = 94
+        upper_s = 255
+        upper_v = 255
+        """
+
         # Definir los límites de color en HSV basados en los valores de los trackbars
         lower_bound = np.array([lower_h, lower_s, lower_v])
         upper_bound = np.array([upper_h, upper_s, upper_v])
 
+        """
         # Obtener los valores HSV actuales de los trackbars
-        lower_h2 = cv2.getTrackbarPos("Lower H", "Controles HSV dedos")
-        lower_s2 = cv2.getTrackbarPos("Lower S", "Controles HSV dedos")
-        lower_v2 = cv2.getTrackbarPos("Lower V", "Controles HSV dedos")
-        upper_h2 = cv2.getTrackbarPos("Upper H", "Controles HSV dedos")
-        upper_s2 = cv2.getTrackbarPos("Upper S", "Controles HSV dedos")
-        upper_v2 = cv2.getTrackbarPos("Upper V", "Controles HSV dedos")
+        lower_h2 = 40
+        lower_s2 = 16
+        lower_v2 = 87
+        upper_h2 = 100
+        upper_s2 = 255
+        upper_v2 = 255
+        """
+
         # Definir los límites de color en HSV basados en los valores de los trackbars
         lower_bound2 = np.array([lower_h2, lower_s2, lower_v2])
         upper_bound2 = np.array([upper_h2, upper_s2, upper_v2])
         # Detectar y dibujar contornos en el fotograma
-        planta, mask1 = detectar_contornos_planta(
+        planta, mask1, pseudo = detectar_contornos_planta(
             frame, lower_bound, upper_bound, lower_bound2, upper_bound2
         )
 
@@ -1102,11 +1125,22 @@ def procesamiento(img, camera_mode):
         # cv2.imshow('COMPENSADA', planta)
         # cv2.imshow('ORIGINAL', original)
 
+        if camera_mode == "procesada":
+            return planta
+        elif camera_mode == "mascara":
+            return mask1
+        elif camera_mode == "pseudo":
+            return pseudo
+        else:
+            return frame
+
+
     # cv2.imshow('Imagen Pseudo Color', pseudo_color)
     except Exception as e:
         print("sin camara:")
         print(e)
         frame = mostrar_mensaje_sin_camara()
+        return frame
         # cv2.imshow('Detectar Contornos pies', frame)
 
         # Salir del bucle si se presiona la tecla 'q'
@@ -1115,20 +1149,28 @@ def procesamiento(img, camera_mode):
     # image = cv2.resize(image, (640, 480))
 
     # image = cv2.imencode(".jpg", planta)[1].tobytes()
-    if camera_mode == "procesada":
-        return planta
-    elif camera_mode == "mascara":
-        return mask1
-    else:
-        return frame
+    
 
 
 class VideoCamera(object):
     def __init__(self):
 
-       
         self.camera_mode = ""
         self.stateCam = False
+
+        self.lower_h = 30
+        self.lower_s = 16
+        self.lower_v = 103
+        self.upper_h = 94
+        self.upper_s = 255
+        self.upper_v = 255
+
+        self.lower_h2 = 40
+        self.lower_s2 = 16
+        self.lower_v2 = 87
+        self.upper_h2 = 100
+        self.upper_s2 = 255
+        self.upper_v2 = 255
 
     def start(self):
         self.stateCam = True
@@ -1147,6 +1189,35 @@ class VideoCamera(object):
     def set_mode(self, dato):
         self.camera_mode = dato
 
+    def set_hsv_val(self, tipo, valor):
+
+        valor = int(valor)
+
+        if tipo == "lower-h":
+            self.lower_h = valor
+        elif tipo == "lower-s":
+            self.lower_s = valor
+        elif tipo == "lower-v":
+            self.lower_v = valor
+        elif tipo == "upper-h":
+            self.upper_h = valor
+        elif tipo == "upper-s":
+            self.upper_s = valor
+        elif tipo == "upper-v":
+            self.upper_v = valor
+        elif tipo == "lower-h-dedos":
+            self.lower_h = valor
+        elif tipo == "lower-s-dedos":
+            self.lower_s = valor
+        elif tipo == "lower-v-dedos":
+            self.lower_v = valor
+        elif tipo == "upper-h-dedos":
+            self.upper_h = valor
+        elif tipo == "upper-s-dedos":
+            self.upper_s = valor
+        elif tipo == "upper-v-dedos":
+            self.upper_v = valor
+
     def __del__(self):
         self.cap.release()
 
@@ -1154,9 +1225,22 @@ class VideoCamera(object):
         success, image = self.cap.read()
         # image=cv2.resize(image,(840,640))
         if success:
-            image = procesamiento(image, self.camera_mode)
+            image = procesamiento(
+                image,
+                self.camera_mode,
+                self.lower_h,
+                self.lower_s,
+                self.lower_v,
+                self.upper_h,
+                self.upper_s,
+                self.upper_v,
+                self.lower_h2,
+                self.lower_s2,
+                self.lower_v2,
+                self.upper_h2,
+                self.upper_s2,
+                self.upper_v2,
+            )
         # so we must encode it into JPEG in order to correctly display the video stream.
         ret, jpeg = cv2.imencode(".jpg", image)
         return jpeg.tobytes()
-
-    
