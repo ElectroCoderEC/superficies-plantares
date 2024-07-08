@@ -28,6 +28,17 @@ class Database:
         cursor.close()
         self.connection.close()
 
+    def insert_pie(self, nombre, descripcion):
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO plantillas (nombre,descripcion) VALUES (%s, %s)",
+            (nombre, descripcion),
+        )
+        self.connection.commit()
+        cursor.close()
+        self.connection.close()
+
     def fetch_users(self):
         self.connect()
         cursor = self.connection.cursor()
@@ -36,6 +47,15 @@ class Database:
         cursor.close()
         self.connection.close()
         return users
+
+    def fetch_plantillas(self):
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM plantillas order by id DESC")
+        plantillas = cursor.fetchall()
+        cursor.close()
+        self.connection.close()
+        return plantillas
 
     def get_user_data(self, id_cliente):
         self.connect()
@@ -63,3 +83,29 @@ class Database:
         self.connection.commit()
         cursor.close()
         self.connection.close()
+
+    def delete_pie(self, id_pie):
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute("DELETE FROM plantillas WHERE id = %s", (id_pie,))
+        self.connection.commit()
+        cursor.close()
+        self.connection.close()
+
+    def get_number_users(self):
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT COUNT(id) FROM usuarios")
+        count = cursor.fetchone()
+        cursor.close()
+        self.connection.close()
+        return count[0]
+
+    def get_number_plantillas(self):
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT COUNT(id) FROM plantillas")
+        count = cursor.fetchone()
+        cursor.close()
+        self.connection.close()
+        return count[0]

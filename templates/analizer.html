@@ -36,6 +36,11 @@
         <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
       <!-- Style.css -->
       <link rel="stylesheet" href="{{url_for('static', filename='assets/css/style.css')}}" type="text/css" >
+
+      <!-- WEBSOCKET SOCKET IO -->
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+
      
   </head>
 
@@ -263,6 +268,14 @@
                           <div class="pcoded-navigation-label" data-i18n="nav.category.forms">Herramientas</div>
                           <ul class="pcoded-item pcoded-left-item">
                               <li>
+                                <a href="{{url_for('plantillas')}}" class="waves-effect waves-dark">
+                                    <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
+                                    <span class="pcoded-mtext" data-i18n="nav.form-components.main">Plantillas</span>
+                                    <span class="pcoded-mcaret"></span>
+                                </a>
+                              </li>
+
+                              <li>
                                   <a href="{{url_for('usuarios')}}" class="waves-effect waves-dark">
                                       <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
                                       <span class="pcoded-mtext" data-i18n="nav.form-components.main">Usuarios</span>
@@ -271,7 +284,7 @@
                               </li>
                               <li>
                                 <li >
-                                  <a href="bs-basic-table.html" class="waves-effect waves-dark">
+                                  <a href="{{url_for('calibracion')}}" class="waves-effect waves-dark">
                                       <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
                                       <span class="pcoded-mtext" data-i18n="nav.form-components.main">Calibración</span>
                                       <span class="pcoded-mcaret"></span>
@@ -279,7 +292,7 @@
                                   </li>
                               </li>
                               <li class="active">
-                                <a href="bs-basic-table.html" class="waves-effect waves-dark">
+                                <a href="" class="waves-effect waves-dark">
                                     <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
                                     <span class="pcoded-mtext" data-i18n="nav.form-components.main">Analizador</span>
                                     <span class="pcoded-mcaret"></span>
@@ -343,9 +356,9 @@
                                                                    
                                                                     <h5 >
                                                                         <select name="select" class="tipoVideo btn-block" >
-                                                                            <option value="procesada">Imagen Procesada</option>
-                                                                            <option value="pseudo">Imagen PseudoColor</option>
+                                                                            <option value="procesada">Imagen Procesada</option>  
                                                                             <option value="mascara">Imagen Máscara</option>
+                                                                            <option value="pseudo">Imagen PseudoColor</option>
                                                                             <option value="normal">Imagen Normal</option>
                                                                         </select>
                                                                     </h5>
@@ -553,8 +566,8 @@
                                                                         <img src="assets/images/plantilla.png" width="50%" >                                               
                                                                     </div>
                                                                     <div class="col-6 text-center">
-                                                                        <h1 >0%</h1>
-                                                                        <h5 >Tipo de Pie</h5>
+                                                                        <h1 id="valorIzquierdo" style="color: red;">0%</h1>
+                                                                        <h5 id="tipoIzquierdo">Tipo de Pie</h5>
                                                                     </div>
                                                                 </div>
     
@@ -575,8 +588,8 @@
                                                                         <img src="assets/images/plantilla_right.png" width="50%"  >                                               
                                                                     </div>
                                                                     <div class="col-6 text-center">
-                                                                        <h1 >0%</h1>
-                                                                        <h5 >Tipo de Pie</h5>
+                                                                        <h1 id="valorDerecho" style="color: red;">0%</h1>
+                                                                        <h5 id="tipoDerecho">Tipo de Pie</h5>
                                                                     </div>
                                                                 </div>
     

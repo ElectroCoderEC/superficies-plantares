@@ -24,7 +24,9 @@ $(document).ready(function () {
 	}
 
 
-	function defaultValue(inputId) {
+	function defaultValue(inputId, labelId) {
+
+		$('#' + labelId).text($('#' + inputId).val());
 
 		$.ajax({
 			url: '/set_controles',
@@ -71,26 +73,43 @@ $(document).ready(function () {
 		$('#upper-s-dedos').val(255)
 		$('#upper-v-dedos').val(255)
 
-		defaultValue("lower-h")
-		defaultValue("lower-s")
-		defaultValue("lower-v")
-		defaultValue("upper-h")
-		defaultValue("upper-s")
-		defaultValue("upper-v")
+		defaultValue("lower-h", 'lower-h-val')
+		defaultValue("lower-s", 'lower-s-val')
+		defaultValue("lower-v", 'lower-v-val')
+		defaultValue("upper-h", 'upper-h-val')
+		defaultValue("upper-s", 'upper-s-val')
+		defaultValue("upper-v", 'upper-v-val')
 
-		defaultValue("lower-h-dedos")
-		defaultValue("lower-s-dedos")
-		defaultValue("lower-v-dedos")
-		defaultValue("upper-h-dedos")
-		defaultValue("upper-s-dedos")
-		defaultValue("upper-v-dedos")
-
-
-
-
+		defaultValue("lower-h-dedos", 'lower-h-dedos-val')
+		defaultValue("lower-s-dedos", 'lower-s-dedos-val')
+		defaultValue("lower-v-dedos", 'lower-v-dedos-val')
+		defaultValue("upper-h-dedos", 'upper-h-dedos-val')
+		defaultValue("upper-s-dedos", 'upper-s-dedos-val')
+		defaultValue("upper-v-dedos", 'upper-v-dedos-val')
 	});
 
 
+	var socket = io.connect('http://' + document.domain + ':' + location.port);
+	socket.on('status_update', function (data) {
+
+		if (data.Pizquierdo.includes("---")) {
+			$('#valorIzquierdo').text(data.Pizquierdo);
+		}
+		else {
+			$('#valorIzquierdo').text(data.Pizquierdo + "%");
+		}
+
+		if (data.Pderecho.includes("---")) {
+			$('#valorDerecho').text(data.Pderecho);
+		}
+		else {
+			$('#valorDerecho').text(data.Pderecho + "%");
+		}
+
+		$('#tipoIzquierdo').text(data.Tizquierdo);
+		$('#tipoDerecho').text(data.Tderecho);
+
+	});
 
 });
 

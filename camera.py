@@ -18,6 +18,11 @@ factor = 12.3
 # audio_thread = threading.Thread(target=play_audio1)
 # audio_thread.start()
 
+PORC1 = "---"
+PORC2 = "---"
+TIPO1 = ""
+TIPO2 = ""
+
 
 # Función para calcular los puntos de una línea perpendicular
 def calculate_perpendicular_points(px, py, m, length):
@@ -177,7 +182,7 @@ def categorizar_pie(porcentaje):
 def detectar_contornos_planta(
     framed, lower_bound, upper_bound, lower_bound2, upper_bound2
 ):
-    global malcolocado, pseudo_color
+    global malcolocado, pseudo_color, PORC1, PORC2, TIPO1, TIPO2
 
     try:
         #           DETECCION DE PLANTA
@@ -230,6 +235,9 @@ def detectar_contornos_planta(
         FUNCIONAL = False
         TIPO1 = ""
         TIPO2 = ""
+        PORC1 = "---"
+        PORC2 = "---"
+
     try:
         COLOCADO = False
         if FUNCIONAL:
@@ -573,6 +581,7 @@ def detectar_contornos_planta(
                         PIE_IZQUIERDO = ((Xcm - Ycm) / Xcm) * 100
                         izquierdo_porc = "%: {:.1f}".format(PIE_IZQUIERDO)
                         TIPO1 = categorizar_pie(PIE_IZQUIERDO)
+                        PORC1 = PIE_IZQUIERDO
                         print(TIPO1)
                         cv2.putText(
                             frame,
@@ -851,6 +860,7 @@ def detectar_contornos_planta(
                         PIE_DERECHO = abs(100 - PIE_DERECHO)
                         derecho_porc = "%: {:.1f}".format(PIE_DERECHO)
                         TIPO2 = categorizar_pie(PIE_DERECHO)
+                        PORC2 = PIE_DERECHO
                         print(TIPO2)
                         cv2.putText(
                             frame,
@@ -927,6 +937,9 @@ def detectar_contornos_planta(
     except Exception as e:
         TIPO1 = ""
         TIPO2 = ""
+        PORC1 = "---"
+        PORC2 = "---"
+
         print("COLOQUE BIEN LOS PIES:")
         malcolocado += 1
         print(malcolocado)
@@ -940,7 +953,7 @@ def detectar_contornos_planta(
         """
         print(e)
 
-    return frame, mask, pseudo_color
+    return frame, mask, pseudo_color, PORC1, PORC2, TIPO1, TIPO2
 
 
 # Función para dibujar rectángulo y texto
@@ -985,8 +998,8 @@ def dibujar_rectangulo_y_texto_planta(frame, contornos, texto, tipo, color):
 
 
 # Función de callback para los trackbars (no hace nada, pero es necesaria)
-def nothing(x):
-    pass
+# def nothing(x):
+#    pass
 
 
 # Función para mostrar el mensaje de "Sin cámara"
@@ -1074,7 +1087,8 @@ def procesamiento(
 
     # DESCOMENTAR PARA Q FUNCIONE IMAGEN
     # frame = frame_original.copy()
-
+    porcI = "---"
+    porcD = "---"
     try:
         h, w = frame.shape[:2]
         # print(h,w)
@@ -1117,7 +1131,7 @@ def procesamiento(
         lower_bound2 = np.array([lower_h2, lower_s2, lower_v2])
         upper_bound2 = np.array([upper_h2, upper_s2, upper_v2])
         # Detectar y dibujar contornos en el fotograma
-        planta, mask1, pseudo = detectar_contornos_planta(
+        planta, mask1, pseudo, porcI, porcD, tipoI, tipoD = detectar_contornos_planta(
             frame, lower_bound, upper_bound, lower_bound2, upper_bound2
         )
 
@@ -1126,21 +1140,20 @@ def procesamiento(
         # cv2.imshow('ORIGINAL', original)
 
         if camera_mode == "procesada":
-            return planta
+            return planta, porcI, porcD, tipoI, tipoD
         elif camera_mode == "mascara":
-            return mask1
+            return mask1, porcI, porcD, tipoI, tipoD
         elif camera_mode == "pseudo":
-            return pseudo
+            return pseudo, porcI, porcD, tipoI, tipoD
         else:
-            return frame
-
+            return frame, porcI, porcD, tipoI, tipoD
 
     # cv2.imshow('Imagen Pseudo Color', pseudo_color)
     except Exception as e:
         print("sin camara:")
         print(e)
         frame = mostrar_mensaje_sin_camara()
-        return frame
+        return frame, porcI, porcD, tipoI, tipoD
         # cv2.imshow('Detectar Contornos pies', frame)
 
         # Salir del bucle si se presiona la tecla 'q'
@@ -1149,7 +1162,6 @@ def procesamiento(
     # image = cv2.resize(image, (640, 480))
 
     # image = cv2.imencode(".jpg", planta)[1].tobytes()
-    
 
 
 class VideoCamera(object):
@@ -1171,6 +1183,10 @@ class VideoCamera(object):
         self.upper_h2 = 100
         self.upper_s2 = 255
         self.upper_v2 = 255
+        self.txtIzquierda = "---"
+        self.txtDerecha = "---"
+        self.tipoIzquierda = ""
+        self.tipoDerecha = ""
 
     def start(self):
         self.stateCam = True
@@ -1206,17 +1222,17 @@ class VideoCamera(object):
         elif tipo == "upper-v":
             self.upper_v = valor
         elif tipo == "lower-h-dedos":
-            self.lower_h = valor
+            self.lower_h2 = valor
         elif tipo == "lower-s-dedos":
-            self.lower_s = valor
+            self.lower_s2 = valor
         elif tipo == "lower-v-dedos":
-            self.lower_v = valor
+            self.lower_v2 = valor
         elif tipo == "upper-h-dedos":
-            self.upper_h = valor
+            self.upper_h2 = valor
         elif tipo == "upper-s-dedos":
-            self.upper_s = valor
+            self.upper_s2 = valor
         elif tipo == "upper-v-dedos":
-            self.upper_v = valor
+            self.upper_v2 = valor
 
     def __del__(self):
         self.cap.release()
@@ -1225,7 +1241,13 @@ class VideoCamera(object):
         success, image = self.cap.read()
         # image=cv2.resize(image,(840,640))
         if success:
-            image = procesamiento(
+            (
+                image,
+                self.txtIzquierda,
+                self.txtDerecha,
+                self.tipoIzquierda,
+                self.tipoDerecha,
+            ) = procesamiento(
                 image,
                 self.camera_mode,
                 self.lower_h,
@@ -1243,4 +1265,10 @@ class VideoCamera(object):
             )
         # so we must encode it into JPEG in order to correctly display the video stream.
         ret, jpeg = cv2.imencode(".jpg", image)
-        return jpeg.tobytes()
+        return (
+            jpeg.tobytes(),
+            self.txtIzquierda,
+            self.txtDerecha,
+            self.tipoIzquierda,
+            self.tipoDerecha,
+        )

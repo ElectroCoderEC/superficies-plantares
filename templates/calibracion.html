@@ -36,6 +36,12 @@
         <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
       <!-- Style.css -->
       <link rel="stylesheet" href="{{url_for('static', filename='assets/css/style.css')}}" type="text/css" >
+
+      <!-- WEBSOCKET SOCKET IO -->
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+
+     
   </head>
 
   <body>
@@ -114,7 +120,7 @@
                           </div>
                       </div>
                       <a href="index.html">
-                          <img class="img-fluid" src="assets/images/logo.png" alt="Theme-Logo" />
+                          <img class="img-fluid" src="{{url_for('static', filename='assets/images/logo.png')}}" alt="Theme-Logo" />
                       </a>
                       <a class="mobile-options waves-effect waves-light">
                           <i class="ti-more"></i>
@@ -154,7 +160,7 @@
                                   </li>
                                   <li class="waves-effect waves-light">
                                       <div class="media">
-                                          <img class="d-flex align-self-center img-radius" src="assets/images/avatar-2.jpg" alt="Generic placeholder image">
+                                          <img class="d-flex align-self-center img-radius" src="{{url_for('static', filename='assets/images/avatar-2.jpg')}}" alt="Generic placeholder image">
                                           <div class="media-body">
                                               <h5 class="notification-user">Administrador</h5>
                                               <p class="notification-msg">Lorem ipsum dolor sit amet, consectetuer elit.</p>
@@ -164,7 +170,7 @@
                                   </li>
                                   <li class="waves-effect waves-light">
                                       <div class="media">
-                                          <img class="d-flex align-self-center img-radius" src="assets/images/avatar-4.jpg" alt="Generic placeholder image">
+                                          <img class="d-flex align-self-center img-radius" src="{{url_for('static', filename='assets/images/avatar-4.jpg')}}" alt="Generic placeholder image">
                                           <div class="media-body">
                                               <h5 class="notification-user">Joseph William</h5>
                                               <p class="notification-msg">Lorem ipsum dolor sit amet, consectetuer elit.</p>
@@ -174,7 +180,7 @@
                                   </li>
                                   <li class="waves-effect waves-light">
                                       <div class="media">
-                                          <img class="d-flex align-self-center img-radius" src="assets/images/avatar-3.jpg" alt="Generic placeholder image">
+                                          <img class="d-flex align-self-center img-radius" src="{{url_for('static', filename='assets/images/avatar-3.jpg')}}" alt="Generic placeholder image">
                                           <div class="media-body">
                                               <h5 class="notification-user">Sara Soudein</h5>
                                               <p class="notification-msg">Lorem ipsum dolor sit amet, consectetuer elit.</p>
@@ -186,7 +192,7 @@
                           </li>
                           <li class="user-profile header-notification">
                               <a href="#!" class="waves-effect waves-light">
-                                  <img src="assets/images/avatar-4.jpg" class="img-radius" alt="User-Profile-Image">
+                                  <img src="{{url_for('static', filename='assets/images/avatar-4.jpg')}}" class="img-radius" alt="User-Profile-Image">
                                   <span>Administrador</span>
                                   <i class="ti-angle-down"></i>
                               </a>
@@ -230,7 +236,7 @@
                       <div class="pcoded-inner-navbar main-menu">
                           <div class="">
                               <div class="main-menu-header">
-                                  <img class="img-80 img-radius" src="assets/images/avatar-4.jpg" alt="User-Profile-Image">
+                                  <img class="img-80 img-radius" src="{{url_for('static', filename='assets/images/avatar-4.jpg')}}" alt="User-Profile-Image">
                                   <div class="user-details">
                                       <span id="more-details">Administrador<i class="fa fa-caret-down"></i></span>
                                   </div>
@@ -253,7 +259,7 @@
                             <li>
                                   <a href="{{url_for('dashboard')}}" class="waves-effect waves-dark">
                                       <span class="pcoded-micon"><i class="ti-home"></i><b>D</b></span>
-                                      <span class="pcoded-mtext" data-i18n="nav.dash.main">Home</span>
+                                      <span class="pcoded-mtext" data-i18n="nav.dash.main">Inicio</span>
                                       <span class="pcoded-mcaret"></span>
                                   </a>
                              
@@ -262,7 +268,15 @@
                           <div class="pcoded-navigation-label" data-i18n="nav.category.forms">Herramientas</div>
                           <ul class="pcoded-item pcoded-left-item">
                               <li>
-                                  <a href="form-elements-component.html" class="waves-effect waves-dark">
+                                <a href="{{url_for('plantillas')}}" class="waves-effect waves-dark">
+                                    <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
+                                    <span class="pcoded-mtext" data-i18n="nav.form-components.main">Plantillas</span>
+                                    <span class="pcoded-mcaret"></span>
+                                </a>
+                              </li>
+
+                              <li>
+                                  <a href="{{url_for('usuarios')}}" class="waves-effect waves-dark">
                                       <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
                                       <span class="pcoded-mtext" data-i18n="nav.form-components.main">Usuarios</span>
                                       <span class="pcoded-mcaret"></span>
@@ -270,20 +284,14 @@
                               </li>
                               <li>
                                 <li class="active">
-                                  <a href="bs-basic-table.html" class="waves-effect waves-dark">
+                                  <a href="{{url_for('calibracion')}}" class="waves-effect waves-dark">
                                       <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
                                       <span class="pcoded-mtext" data-i18n="nav.form-components.main">Calibración</span>
                                       <span class="pcoded-mcaret"></span>
                                   </a>
                                   </li>
                               </li>
-                              <li>
-                                <a href="{{url_for('analyzer')}}" class="waves-effect waves-dark">
-                                    <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
-                                    <span class="pcoded-mtext" data-i18n="nav.form-components.main">Analizador</span>
-                                    <span class="pcoded-mcaret"></span>
-                                </a>
-                            </li>
+                              
         
                           </ul>
         
@@ -291,29 +299,33 @@
                       </div>
                   </nav>
                   <div class="pcoded-content">
+              
                       <!-- Page-header start -->
-                      <div class="page-header">
-                        <div class="page-block">
-                            <div class="row align-items-center">
-                                <div class="col-md-8">
-                                    <div class="page-header-title">
-                                        <h4 class="m-b-10">CALIBRACIÓN</h4>
-                                        <p class="m-b-0">Corrección de colores del ambiente</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <ul class="breadcrumb-title">
-                                        <li class="breadcrumb-item">
-                                            <a href="index.html"> <i class="fa fa-home"></i> </a>
-                                        </li>
-                                        <li class="breadcrumb-item"><a href="#!">Calibración</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                      <!-- Page-header end -->
+                     <div class="page-header">
+                       <div class="page-block">
+                           <div class="row align-items-center">
+                               <div class="col-md-8">
+                                   <div class="page-header-title">
+                                       <h4 class="m-b-10">CALIBRACIÓN</h4>
+                                       <p class="m-b-0">Corrección de colores del ambiente</p>
+                                   </div>
+                               </div>
+                               <div class="col-md-4">
+                                   <ul class="breadcrumb-title">
+                                       <li class="breadcrumb-item">
+                                           <a href="index.html"> <i class="fa fa-home"></i> </a>
+                                       </li>
+                                       <li class="breadcrumb-item"><a href="#!">Calibración</a>
+                                       </li>
+                                   </ul>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+                     <!-- Page-header end -->
+                      
+                 
+
                         <div class="pcoded-inner-content">
                             <!-- Main-body start -->
                             <div class="main-body">
@@ -325,14 +337,143 @@
                                             
                                             <!--  sale analytics start -->
                                             <div class="col-xl-7 col-md-12">
-                                                <div class="card">
-                                                    <div class="card-header">
+                                                <div class="card user-card">
+                                                    
+                                                        <div class="card-header">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <h5 >IMAGEN ACTUAL</h5>
+                                                                </div>
+                                                                <div class="col-md-6" >
+                                                                   
+                                                                    <h5 >
+                                                                        <select name="select" class="tipoVideo btn-block" >
+                                                                            <option value="procesada">Imagen Procesada</option>  
+                                                                            <option value="mascara">Imagen Máscara</option>
+                                                                            <option value="pseudo">Imagen PseudoColor</option>
+                                                                            <option value="normal">Imagen Normal</option>
+                                                                        </select>
+                                                                    </h5>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                            
+                                                        </div>
+
+
                                                         <img src="{{ url_for('video_feed') }}">
-                                                    </div>
+                                                        
+                                                    
                                                    
                                                 </div>
+
+                                           
+
                                             </div>
-                                        
+
+                                            <div class="col-xl-5 col-md-8">
+
+                                                <div class="card user-card" id="contenedorBotones">
+
+                                                    <div class="card-body  text-center">
+
+                                                        <h3>Controles HSV</h3>
+                                                        <form id="hsv-form" method="POST">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="slider-container">
+                                                                        <label for="lower-h">Lower H: <span id="lower-h-val">30</span></label>
+                                                                        <input type="range" id="lower-h" name="lower_h" min="0" max="179" value="30" class="form-control">
+                                                                    </div>
+                                                                    <div class="slider-container">
+                                                                        <label for="lower-s">Lower S: <span id="lower-s-val">16</span></label>
+                                                                        <input type="range" id="lower-s" name="lower_s" min="0" max="255" value="16" class="form-control">
+                                                                    </div>
+                                                                    <div class="slider-container">
+                                                                        <label for="lower-v">Lower V: <span id="lower-v-val">103</span></label>
+                                                                        <input type="range" id="lower-v" name="lower_v" min="0" max="255" value="103" class="form-control">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="slider-container">
+                                                                        <label for="upper-h">Upper H: <span id="upper-h-val">94</span></label>
+                                                                        <input type="range" id="upper-h" name="upper_h" min="0" max="179" value="94" class="form-control">
+                                                                    </div>
+                                                                    <div class="slider-container">
+                                                                        <label for="upper-s">Upper S: <span id="upper-s-val">255</span></label>
+                                                                        <input type="range" id="upper-s" name="upper_s" min="0" max="255" value="255" class="form-control">
+                                                                    </div>
+                                                                    <div class="slider-container">
+                                                                        <label for="upper-v">Upper V: <span id="upper-v-val">255</span></label>
+                                                                        <input type="range" id="upper-v" name="upper_v" min="0" max="255" value="255" class="form-control">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                          <!--  <button type="submit" class="btn btn-primary">Submit</button>-->
+                                                        </form>
+
+                                                        
+
+                                                        <h3>Controles HSV dedos</h3>
+                                                        <form id="hsv-dedos-form" method="POST">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="slider-container">
+                                                                        <label for="lower-h-dedos">Lower H: <span id="lower-h-dedos-val">40</span></label>
+                                                                        <input type="range" id="lower-h-dedos" name="lower_h_dedos" min="0" max="179" value="40" class="form-control">
+                                                                    </div>
+                                                                    <div class="slider-container">
+                                                                        <label for="lower-s-dedos">Lower S: <span id="lower-s-dedos-val">16</span></label>
+                                                                        <input type="range" id="lower-s-dedos" name="lower_s_dedos" min="0" max="255" value="16" class="form-control">
+                                                                    </div>
+                                                                    <div class="slider-container">
+                                                                        <label for="lower-v-dedos">Lower V: <span id="lower-v-dedos-val">87</span></label>
+                                                                        <input type="range" id="lower-v-dedos" name="lower_v_dedos" min="0" max="255" value="87" class="form-control">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="slider-container">
+                                                                        <label for="upper-h-dedos">Upper H: <span id="upper-h-dedos-val">100</span></label>
+                                                                        <input type="range" id="upper-h-dedos" name="upper_h_dedos" min="0" max="179" value="100" class="form-control">
+                                                                    </div>
+                                                                    <div class="slider-container">
+                                                                        <label for="upper-s-dedos">Upper S: <span id="upper-s-dedos-val">255</span></label>
+                                                                        <input type="range" id="upper-s-dedos" name="upper_s_dedos" min="0" max="255" value="255" class="form-control">
+                                                                    </div>
+                                                                    <div class="slider-container">
+                                                                        <label for="upper-v-dedos">Upper V: <span id="upper-v-dedos-val">255</span></label>
+                                                                        <input type="range" id="upper-v-dedos" name="upper_v_dedos" min="0" max="255" value="255" class="form-control">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                          <!-- <button type="submit" class="btn btn-primary">Submit</button>--> 
+                                                        </form>
+
+                                                        <div class="text center">
+                                                        
+                                                            <button type="button" class="btn btn-primary btn-round" id="btnDefault">
+                                                                <i class="fa fa-repeat"></i> Reestablecer Valores
+                                                            </button>
+                                                                
+                                                        </div>
+
+
+                                                    </div>
+        
+
+                                                   
+                                                  
+
+                                                </div>
+
+                                              
+
+                                              
+
+
+                                            </div>
+
+                                          
                                          
                                             <!--  project and team member end -->
                                         </div>
@@ -420,8 +561,11 @@
     <script src="{{url_for('static', filename='assets/js/pcoded.min.js')}}"></script>
     <script src="{{url_for('static', filename='assets/js/vertical-layout.min.js')}}"></script>
     <!-- custom js -->
-    <script type="text/javascript" src="{{url_for('static', filename='assets/pages/dashboard/custom-dashboard.js')}}"></script>
+   <!--  <script type="text/javascript" src="{{url_for('static', filename='assets/pages/dashboard/custom-dashboard.js')}}"></script>-->
     <script type="text/javascript" src="{{url_for('static', filename='assets/js/script.js')}}" ></script>
+
+     <!-- ANALIZADOR -->    
+     <script src="{{url_for('static', filename='assets/js/analizador.js')}}"></script>
 </body>
 
 </html>

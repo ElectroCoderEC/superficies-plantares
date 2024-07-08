@@ -7,6 +7,7 @@ Created on Mon July 1 15:34:08 2024
 import os
 import shutil
 from flask import Flask, render_template, Response, request, redirect, jsonify
+from flask_socketio import SocketIO, emit
 import cv2
 from werkzeug.utils import secure_filename
 import json
@@ -16,12 +17,14 @@ from camera import VideoCamera
 from database import Database
 from audio import Reproductor
 
+
 app = Flask(
     __name__,
     static_url_path="",
     static_folder="static",
     template_folder="templates",
 )
+socketio = SocketIO(app)
 
 db_config = {
     "user": "android",
@@ -49,12 +52,43 @@ def index():
 def dashboard():
     if video.state():
         video.stop()
-    return render_template("dashboard.html")
+
+    try:
+        # Configuración de la conexión a la base de datos
+        db = Database(db_config)
+        cuentaU = db.get_number_users()
+        db = Database(db_config)
+        cuentaP = db.get_number_plantillas()
+        print("datooo", cuentaP)
+
+        return render_template("dashboard.html", cuentaU=cuentaU, cuentaP=cuentaP)
+
+    except Exception as e:
+        audio.play_error()
+        return render_template("usuarios.html", errorbase="error")
 
 
 @app.route("/calibracion")
 def calibracion():
     return render_template("calibracion.html")
+
+
+@app.route("/plantillas")
+def plantillas():
+
+    if video.state():
+        video.set_mode("procesada")
+        video.stop()
+
+    try:
+        # Configuración de la conexión a la base de datos
+        db = Database(db_config)
+        plantillas = db.fetch_plantillas()
+        return render_template("plantillas.html", plantillas=plantillas)
+
+    except Exception as e:
+        audio.play_error()
+        return render_template("plantillas.html", errorbase="error")
 
 
 @app.route("/usuarios")
@@ -161,6 +195,26 @@ def submit():
         return jsonify({"status": "error", "message": str(err)})
 
 
+# Ruta para manejar el envío del formulario PLANTILLA
+@app.route("/submitPlantilla", methods=["POST"])
+def submitPlantilla():
+
+    try:
+        db = Database(db_config)
+
+        nombre = request.form["nuevoPlantilla"]
+        descripcion = request.form["nuevoDescripcion"]
+        db.insert_pie(nombre, descripcion)
+
+        audio.play_registro()
+        return jsonify({"status": "success"})
+    # return redirect("/usuarios")
+
+    except Exception as err:
+        audio.play_error()
+        return jsonify({"status": "error", "message": str(err)})
+
+
 @app.route("/select_user", methods=["POST"])
 def select_user():
     data = request.get_json()
@@ -201,12 +255,33 @@ def delete_user():
     return jsonify({"message": "Usuario eliminado correctamente"})
 
 
+@app.route("/delete_plantilla", methods=["POST"])
+def delete_plantilla():
+    data = request.get_json()
+    id_plantilla = data["idPlantilla"]
+    db = Database(db_config)
+    db.delete_pie(id_plantilla)
+    return jsonify({"message": "Plantilla borrada correctamente"})
+
+
 def video_stream(camera):
     if video.state() == False:
         video.start()
 
     while True:
-        frame = camera.get_frame()
+        frame, valorIzquierda, valorDerecha, tipoIzquierda, tipoDerecha = (
+            camera.get_frame()
+        )
+        socketio.emit(
+            "status_update",
+            {
+                "Pizquierdo": valorIzquierda,
+                "Pderecho": valorDerecha,
+                "Tizquierdo": tipoIzquierda,
+                "Tderecho": tipoDerecha,
+            },
+        )
+        # socketio.sleep(0.1)
         yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n\r\n")
 
 
@@ -235,9 +310,10 @@ def set_controles():
 
     video.set_hsv_val(tipo_control, valor_control)
 
-    print("TIPOOOO: " + tipo_control + "  VALOR:" + valor_control)
+    # print("TIPOOOO: " + tipo_control + "  VALOR:" + valor_control)
     return jsonify({"message": "TIPOOOO: " + tipo_control + "  VALOR:" + valor_control})
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # app.run(host="0.0.0.0", port=5000, debug=True)
+    socketio.run(app, host="0.0.0.0", port=5000, debug=True)
