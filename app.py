@@ -26,13 +26,7 @@ app = Flask(
 )
 socketio = SocketIO(app)
 
-db_config = {
-    "user": "android",
-    "password": "12345678",
-    "host": "localhost",
-    "database": "pies",
-}
-
+db = Database()
 audio = Reproductor()
 video = VideoCamera()
 video.set_mode("procesada")
@@ -53,24 +47,28 @@ def dashboard():
     if video.state():
         video.stop()
 
-    try:
-        # Configuración de la conexión a la base de datos
-        db = Database(db_config)
-        cuentaU = db.get_number_users()
-        db = Database(db_config)
-        cuentaP = db.get_number_plantillas()
-        print("datooo", cuentaP)
+    # try:
+    # Configuración de la conexión a la base de datos
+    # db = Database(db_config)
 
-        return render_template("dashboard.html", cuentaU=cuentaU, cuentaP=cuentaP)
+    cuentaU = db.get_number_users()
+    # db = Database(db_config)
 
-    except Exception as e:
-        audio.play_error()
-        return render_template("usuarios.html", errorbase="error")
+    cuentaP = db.get_number_plantillas()
+    print("datooo", cuentaP)
+
+    return render_template("dashboard.html", cuentaU=cuentaU, cuentaP=cuentaP)
+
+
+# except Exception as e:
+#      audio.play_error()
+#     return render_template("usuarios.html", errorbase="error: " + str(e))
 
 
 @app.route("/calibracion")
 def calibracion():
-    return render_template("calibracion.html")
+    variables = db.fetch_configuraciones()
+    return render_template("calibracion.html", variables=variables)
 
 
 @app.route("/plantillas")
@@ -82,7 +80,7 @@ def plantillas():
 
     try:
         # Configuración de la conexión a la base de datos
-        db = Database(db_config)
+        # db = Database(db_config)
         plantillas = db.fetch_plantillas()
         return render_template("plantillas.html", plantillas=plantillas)
 
@@ -100,7 +98,7 @@ def usuarios():
 
     try:
         # Configuración de la conexión a la base de datos
-        db = Database(db_config)
+        # db = Database(db_config)
         users = db.fetch_users()
         return render_template("usuarios.html", users=users)
 
@@ -113,7 +111,8 @@ def usuarios():
 def analyzer():
     usuario = request.args.get("usuario")
     usuario = json.loads(usuario)
-    return render_template("analizer.html", usuario=usuario)
+    variables = db.fetch_configuraciones()
+    return render_template("analizer.html", usuario=usuario, variables=variables)
 
 
 # Ruta para manejar el envío del formulario
@@ -121,8 +120,7 @@ def analyzer():
 def submit():
 
     try:
-        db = Database(db_config)
-
+        # db = Database(db_config)
         nombre = request.form["nuevoNombre"]
         cedula = request.form["nuevoCedula"]
         telefono = request.form["nuevoTelefono"]
@@ -200,8 +198,7 @@ def submit():
 def submitPlantilla():
 
     try:
-        db = Database(db_config)
-
+        # db = Database(db_config)
         nombre = request.form["nuevoPlantilla"]
         descripcion = request.form["nuevoDescripcion"]
         db.insert_pie(nombre, descripcion)
@@ -219,7 +216,7 @@ def submitPlantilla():
 def select_user():
     data = request.get_json()
     id_usuario = data["idUsuario"]
-    db = Database(db_config)
+    # db = Database(db_config)
 
     # Obtener la cédula del usuario a eliminar (asumiendo que tienes un método para eso)
     print(f"Obteniendo ID: {id_usuario}")
@@ -234,7 +231,7 @@ def select_user():
 def delete_user():
     data = request.get_json()
     id_usuario = data["idUsuario"]
-    db = Database(db_config)
+    # db = Database(db_config)
 
     # Obtener la cédula del usuario a eliminar (asumiendo que tienes un método para eso)
     print(f"Obteniendo cédula para el usuario con ID: {id_usuario}")
@@ -249,7 +246,7 @@ def delete_user():
         shutil.rmtree(user_folder)
 
     # Eliminar el usuario de la base de datos
-    db = Database(db_config)
+    # db = Database(db_config)
     db.delete_user(id_usuario)
 
     return jsonify({"message": "Usuario eliminado correctamente"})
@@ -259,7 +256,7 @@ def delete_user():
 def delete_plantilla():
     data = request.get_json()
     id_plantilla = data["idPlantilla"]
-    db = Database(db_config)
+    # db = Database(db_config)
     db.delete_pie(id_plantilla)
     return jsonify({"message": "Plantilla borrada correctamente"})
 
@@ -269,7 +266,7 @@ def video_stream(camera):
         video.start()
 
     while True:
-        frame, valorIzquierda, valorDerecha, tipoIzquierda, tipoDerecha = (
+        frame, valorIzquierda, valorDerecha, tipoIzquierda, tipoDerecha, txtBien = (
             camera.get_frame()
         )
         socketio.emit(
@@ -279,6 +276,7 @@ def video_stream(camera):
                 "Pderecho": valorDerecha,
                 "Tizquierdo": tipoIzquierda,
                 "Tderecho": tipoDerecha,
+                "txtBien": txtBien,
             },
         )
         # socketio.sleep(0.1)
@@ -293,6 +291,15 @@ def video_feed():
     )
 
 
+@app.route("/set_check", methods=["POST"])
+def setcheck():
+    data = request.get_json()
+    check = data.get("check")
+    video.set_check(check)
+    # print("EL DATO QUE LLEGA ES: ", camera_mode)
+    return jsonify({"message": "Check: " + check})
+
+
 @app.route("/set_mode", methods=["POST"])
 def set_mode():
     data = request.get_json()
@@ -300,6 +307,21 @@ def set_mode():
     video.set_mode(camera_mode)
     # print("EL DATO QUE LLEGA ES: ", camera_mode)
     return jsonify({"message": "Mode set to " + camera_mode})
+
+
+@app.route("/set_imagen", methods=["POST"])
+def set_imagen():
+    data = request.get_json()
+    estado = data.get("estado")
+
+    if estado == "ON":
+        video.set_Capturar()
+
+    elif estado == "OFF":
+        video.set_reproducir()
+
+    # print("EL DATO QUE LLEGA ES: ", camera_mode)
+    return jsonify({"message": "ESTADO REPRODUCIENDO: " + estado})
 
 
 @app.route("/set_controles", methods=["POST"])
@@ -312,6 +334,63 @@ def set_controles():
 
     # print("TIPOOOO: " + tipo_control + "  VALOR:" + valor_control)
     return jsonify({"message": "TIPOOOO: " + tipo_control + "  VALOR:" + valor_control})
+
+
+@app.route("/save_hsv", methods=["POST"])
+def save_hsv():
+    data = request.get_json()
+
+    lower_h = data.get("lower-h")
+    lower_s = data.get("lower-s")
+    lower_v = data.get("lower-v")
+    upper_h = data.get("upper-h")
+    upper_s = data.get("upper-s")
+    upper_v = data.get("upper-v")
+    lower_h2 = data.get("lower-h-dedos")
+    lower_s2 = data.get("lower-s-dedos")
+    lower_v2 = data.get("lower-v-dedos")
+    upper_h2 = data.get("upper-h-dedos")
+    upper_s2 = data.get("upper-s-dedos")
+    upper_v2 = data.get("upper-v-dedos")
+
+    # print("TIPOOOO: " + tipo_control + "  VALOR:" + valor_control)
+
+    try:
+        # db = Database(db_config)
+        db.update_hsv(
+            lower_h,
+            lower_s,
+            lower_v,
+            upper_h,
+            upper_s,
+            upper_v,
+            lower_h2,
+            lower_s2,
+            lower_v2,
+            upper_h2,
+            upper_s2,
+            upper_v2,
+        )
+        return jsonify({"status": "success"})
+
+    # return redirect("/usuarios")
+
+    except Exception as err:
+        audio.play_error()
+        return jsonify({"status": "error", "message": str(err)})
+
+
+@app.route("/get_hsv", methods=["POST"])
+def get_hsv():
+
+    try:
+        variables = db.fetch_configuraciones()
+        socketio.emit("status_hsv", {"variables": variables})
+        return jsonify({"status": "success"})
+
+    except Exception as err:
+        audio.play_error()
+        return jsonify({"status": "error", "message": str(err)})
 
 
 if __name__ == "__main__":

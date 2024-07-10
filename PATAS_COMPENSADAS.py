@@ -10,14 +10,14 @@ import pickle
 pygame.init()
 pygame.mixer.init()
 # audio bienvenida
-audio_file1 = "bien.mp3"
-sound1 = pygame.mixer.Sound(audio_file1)
+# audio_file1 = "bien.mp3"
+# sound1 = pygame.mixer.Sound(audio_file1)
 # colocarse correctamente
-audio_file2 = "coloquese.mp3"
-sound2 = pygame.mixer.Sound(audio_file2)
+# audio_file2 = "coloquese.mp3"
+# sound2 = pygame.mixer.Sound(audio_file2)
 # Calculo
-audio_file3 = "medicion.mp3"
-sound3 = pygame.mixer.Sound(audio_file3)
+# audio_file3 = "medicion.mp3"
+# sound3 = pygame.mixer.Sound(audio_file3)
 
 malcolocado = 0
 factor = 12.3
@@ -26,21 +26,21 @@ Ycm = 0
 
 
 # Función para reproducir el audio
-def play_audio1():
-    sound1.play()
+# def play_audio1():
+#    sound1.play()
 
 
-def play_audio2():
-    sound2.play()
+# def play_audio2():
+#    sound2.play()
 
 
-def play_audio3():
-    sound3.play()
+# def play_audio3():
+#    sound3.play()
 
 
 # Crear un hilo para la reproducción de audio
-audio_thread = threading.Thread(target=play_audio1)
-audio_thread.start()
+# audio_thread = threading.Thread(target=play_audio1)
+# audio_thread.start()
 
 
 # Función para calcular los puntos de una línea perpendicular
@@ -1041,7 +1041,7 @@ cv2.namedWindow("ORIGINAL", cv2.WINDOW_NORMAL)  # Ajustar tamaño de ventanaq
 cv2.resizeWindow("ORIGINAL", w, h)  # Tamaño deseado para visualización
 
 # Cargar los parámetros de calibración guardados
-cameraMatrix, dist = pickle.load(open("calibration.pkl", "rb"))
+cameraMatrix, dist = pickle.load(open("static/pkl/calibration.pkl", "rb"))
 
 while True:
     # DESCOMENTAR PARA Q FUNCIONE CAMARA

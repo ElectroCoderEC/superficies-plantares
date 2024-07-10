@@ -6,14 +6,12 @@ import threading
 import time
 import pickle
 from audio import Reproductor
-
+from flask_socketio import SocketIO, emit
 
 audio = Reproductor()
 
-
 malcolocado = 0
 factor = 12.3
-
 # Crear un hilo para la reproducción de audio
 # audio_thread = threading.Thread(target=play_audio1)
 # audio_thread.start()
@@ -22,6 +20,14 @@ PORC1 = "---"
 PORC2 = "---"
 TIPO1 = ""
 TIPO2 = ""
+
+pseudo_color = None
+colocarBien = ""
+
+capturar = False
+reproducir = True
+guardar = False
+check = False
 
 
 # Función para calcular los puntos de una línea perpendicular
@@ -182,7 +188,7 @@ def categorizar_pie(porcentaje):
 def detectar_contornos_planta(
     framed, lower_bound, upper_bound, lower_bound2, upper_bound2
 ):
-    global malcolocado, pseudo_color, PORC1, PORC2, TIPO1, TIPO2
+    global malcolocado, pseudo_color, PORC1, PORC2, TIPO1, TIPO2, colocarBien
 
     try:
         #           DETECCION DE PLANTA
@@ -239,6 +245,7 @@ def detectar_contornos_planta(
         PORC2 = "---"
 
     try:
+        colocarBien = "BIEN"
         COLOCADO = False
         if FUNCIONAL:
             # Clasificar y procesar los contornos de las plantas
@@ -304,7 +311,7 @@ def detectar_contornos_planta(
             # Dibujar el contorno dedos
             for contour2 in contours2:
                 area = cv2.contourArea(contour2)
-                if 10000 > area > 100:  # Tamaño de dedo gordo
+                if 6000 > area > 100:  # Tamaño de dedo gordo
                     M = cv2.moments(contour2)
                     if M["m00"] != 0:
                         cX = int(M["m10"] / M["m00"])
@@ -939,7 +946,7 @@ def detectar_contornos_planta(
         TIPO2 = ""
         PORC1 = "---"
         PORC2 = "---"
-
+        colocarBien = "MAL"
         print("COLOQUE BIEN LOS PIES:")
         malcolocado += 1
         print(malcolocado)
@@ -1082,14 +1089,30 @@ def procesamiento(
     upper_s2,
     upper_v2,
 ):
-    frame = img
+
+    global capturar, reproducir, colocarBien, check
     # DESCOMENTAR PARA Q FUNCIONE CAMARA
 
     # DESCOMENTAR PARA Q FUNCIONE IMAGEN
     # frame = frame_original.copy()
     porcI = "---"
     porcD = "---"
+    tipoI = ""
+    tipoD = ""
+
     try:
+
+        if reproducir:
+            frame = img
+        else:
+            frame = cv2.imread("static/pruebas/captura.jpg")
+
+        if capturar:
+            if check:
+                cv2.imwrite("static/pruebas/captura.jpg", img)
+            capturar = False
+            # time.sleep(0.1)
+
         h, w = frame.shape[:2]
         # print(h,w)
         newCameraMatrix, roi = cv2.getOptimalNewCameraMatrix(
@@ -1140,20 +1163,20 @@ def procesamiento(
         # cv2.imshow('ORIGINAL', original)
 
         if camera_mode == "procesada":
-            return planta, porcI, porcD, tipoI, tipoD
+            return planta, porcI, porcD, tipoI, tipoD, colocarBien
         elif camera_mode == "mascara":
-            return mask1, porcI, porcD, tipoI, tipoD
+            return mask1, porcI, porcD, tipoI, tipoD, colocarBien
         elif camera_mode == "pseudo":
-            return pseudo, porcI, porcD, tipoI, tipoD
+            return pseudo, porcI, porcD, tipoI, tipoD, colocarBien
         else:
-            return frame, porcI, porcD, tipoI, tipoD
+            return frame, porcI, porcD, tipoI, tipoD, colocarBien
 
     # cv2.imshow('Imagen Pseudo Color', pseudo_color)
     except Exception as e:
         print("sin camara:")
         print(e)
         frame = mostrar_mensaje_sin_camara()
-        return frame, porcI, porcD, tipoI, tipoD
+        return frame, porcI, porcD, tipoI, tipoD, colocarBien
         # cv2.imshow('Detectar Contornos pies', frame)
 
         # Salir del bucle si se presiona la tecla 'q'
@@ -1183,10 +1206,12 @@ class VideoCamera(object):
         self.upper_h2 = 100
         self.upper_s2 = 255
         self.upper_v2 = 255
+
         self.txtIzquierda = "---"
         self.txtDerecha = "---"
         self.tipoIzquierda = ""
         self.tipoDerecha = ""
+        self.colocarBien = ""
 
     def start(self):
         self.stateCam = True
@@ -1194,6 +1219,8 @@ class VideoCamera(object):
         self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        #self.cap.set(10, 150)
+        self.cap.set(28, 0)
 
     def stop(self):
         self.stateCam = False
@@ -1237,6 +1264,39 @@ class VideoCamera(object):
     def __del__(self):
         self.cap.release()
 
+    def get_variables(self):
+        return (
+            self.lower_h,
+            self.lower_s,
+            self.lower_v,
+            self.upper_h,
+            self.upper_s,
+            self.upper_v,
+            self.lower_h2,
+            self.lower_s2,
+            self.lower_v2,
+            self.upper_h2,
+            self.upper_s2,
+            self.upper_v2,
+        )
+
+    def set_Capturar(self):
+        global capturar, reproducir
+        capturar = True
+        reproducir = False
+
+    def set_reproducir(self):
+        global capturar, reproducir
+        reproducir = True
+        capturar = False
+
+    def set_check(self, estado):
+        global check
+        if estado == "True":
+            check = True
+        elif estado == "False":
+            check = False
+
     def get_frame(self):
         success, image = self.cap.read()
         # image=cv2.resize(image,(840,640))
@@ -1247,6 +1307,7 @@ class VideoCamera(object):
                 self.txtDerecha,
                 self.tipoIzquierda,
                 self.tipoDerecha,
+                self.colocarBien,
             ) = procesamiento(
                 image,
                 self.camera_mode,
@@ -1271,4 +1332,5 @@ class VideoCamera(object):
             self.txtDerecha,
             self.tipoIzquierda,
             self.tipoDerecha,
+            self.colocarBien,
         )

@@ -2,9 +2,9 @@
 /*=============================================
 EDITAR USUARIO
 =============================================*/
-$(".tablas").on("click", ".btnEditarUsuario", function () {
+$(".tablas").on("click", ".btnEditarPlantilla", function () {
 
-	var idUsuario = $(this).attr("idUsuario");
+	var idUsuario = $(this).attr("idPlantilla");
 
 	var datos = new FormData();
 	datos.append("idUsuario", idUsuario);

@@ -37,9 +37,14 @@
       <!-- Style.css -->
       <link rel="stylesheet" href="{{url_for('static', filename='assets/css/style.css')}}" type="text/css" >
 
+       <!-- jQuery -->
+     <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
       <!-- WEBSOCKET SOCKET IO -->
       
       <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+      
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
      
   </head>
@@ -357,19 +362,12 @@
                                                                     
                                                                 </div>
                                                             </div>
-                                                            
                                                         </div>
-
-
                                                         <img src="{{ url_for('video_feed') }}">
-                                                        
                                                     
-                                                   
                                                 </div>
-
-                                           
-
                                             </div>
+
 
                                             <div class="col-xl-5 col-md-8">
 
@@ -450,31 +448,31 @@
                                                         </form>
 
                                                         <div class="text center">
-                                                        
-                                                            <button type="button" class="btn btn-primary btn-round" id="btnDefault">
-                                                                <i class="fa fa-repeat"></i> Reestablecer Valores
-                                                            </button>
+
+
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <button type="button" class="btn waves-effect waves-light btn-primary btn-round" id="btnDefault">
+                                                                        <i class="fa fa-repeat"></i> Reestablecer Valores
+                                                                    </button>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <button type="button " class="btn waves-effect waves-light btn-success btn-round" id="btnSaveValues">
+                                                                        <i class="fa fa-check"></i> Guardar Valores
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                          
                                                                 
                                                         </div>
 
 
                                                     </div>
         
-
-                                                   
-                                                  
-
                                                 </div>
-
-                                              
-
-                                              
-
 
                                             </div>
 
-                                          
-                                         
                                             <!--  project and team member end -->
                                         </div>
                                     </div>
@@ -488,6 +486,68 @@
             </div>
         </div>
     </div>
+
+    
+    {% if variables %}
+        {%  for variable in variables %}
+    
+            <script>
+                $(document).ready(function () {
+
+                    function defaultValue(inputId, labelId) {
+
+                        $('#' + labelId).text($('#' + inputId).val());
+
+                        $.ajax({
+                            url: '/set_controles',
+                            method: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ "control": inputId, "valor": $('#' + inputId).val() }),
+                            success: function (response) {
+                                // Puedes manejar la respuesta si es necesario
+                                console.log(response.message);
+                            }
+                        });
+
+                    }
+
+
+                    $('#lower-h').val("{{variable[1]}}");
+                    $('#lower-s').val("{{variable[2]}}");
+                    $('#lower-v').val("{{variable[3]}}");
+
+                    $('#upper-h').val("{{variable[4]}}");
+                    $('#upper-s').val("{{variable[5]}}");
+                    $('#upper-v').val("{{variable[6]}}");
+
+                    $('#lower-h-dedos').val("{{variable[7]}}");
+                    $('#lower-s-dedos').val("{{variable[8]}}");
+                    $('#lower-v-dedos').val("{{variable[9]}}");
+
+                    $('#upper-h-dedos').val("{{variable[10]}}");
+                    $('#upper-s-dedos').val("{{variable[11]}}");
+                    $('#upper-v-dedos').val("{{variable[12]}}");
+
+                    defaultValue("lower-h", 'lower-h-val');
+                    defaultValue("lower-s", 'lower-s-val');
+                    defaultValue("lower-v", 'lower-v-val');
+                    defaultValue("upper-h", 'upper-h-val');
+                    defaultValue("upper-s", 'upper-s-val');
+                    defaultValue("upper-v", 'upper-v-val');
+
+                    defaultValue("lower-h-dedos", 'lower-h-dedos-val');
+                    defaultValue("lower-s-dedos", 'lower-s-dedos-val');
+                    defaultValue("lower-v-dedos", 'lower-v-dedos-val');
+                    defaultValue("upper-h-dedos", 'upper-h-dedos-val');
+                    defaultValue("upper-s-dedos", 'upper-s-dedos-val');
+                    defaultValue("upper-v-dedos", 'upper-v-dedos-val');
+
+                });
+            </script>
+        {% endfor %}
+    {% endif %}
+
+
     <!-- Warning Section Starts -->
     <!-- Older IE warning message -->
     <!--[if lt IE 10]>
