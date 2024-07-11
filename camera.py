@@ -5,10 +5,8 @@ import pygame
 import threading
 import time
 import pickle
-from audio import Reproductor
 from flask_socketio import SocketIO, emit
-
-audio = Reproductor()
+import matplotlib.pyplot as plt
 
 malcolocado = 0
 factor = 12.3
@@ -942,8 +940,23 @@ def detectar_contornos_planta(
             # Convertir la imagen recortada a escala de grises (opcional, si quieres pseudo color basado en escala de grises)
             recorte_gris = cv2.cvtColor(recorte, cv2.COLOR_BGR2GRAY)
             malcolocado = 0
+
+            # Normalizar la imagen a un rango de 0 a 1
+            imagen_normalizada = cv2.normalize(
+                recorte_gris,
+                None,
+                alpha=0,
+                beta=1,
+                norm_type=cv2.NORM_MINMAX,
+                dtype=cv2.CV_32F,
+            )
+
+            # Escalar los valores normalizados a un rango de 0 a 255
+            imagen_escalada = (imagen_normalizada * 255).astype(np.uint8)
+
             # Aplicar una colorización pseudo color a la imagen recortada
-            pseudo_color = cv2.applyColorMap(recorte_gris, cv2.COLORMAP_HOT)
+            pseudo_color = cv2.applyColorMap(imagen_escalada, cv2.COLORMAP_HOT)
+
             # cv2.imshow("Imagen Pseudo Color", pseudo_color)
             # Dibujar los contornos detectados sobre el fotograma
             cv2.drawContours(
@@ -1180,7 +1193,7 @@ def procesamiento(
         imagen_normal = frame
         imagen_mask = mask1
         imagen_pseudo = pseudo
-        imagen_procesada = planta   
+        imagen_procesada = planta
 
         # cv2.imshow('Detectar mask', mask1)
         # cv2.imshow('COMPENSADA', planta)

@@ -12,12 +12,16 @@ import cv2
 from werkzeug.utils import secure_filename
 import json
 from datetime import datetime
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Table, TableStyle, Image
+
 
 # CLASES CREADAS PROPIAS **************************************
 from camera import VideoCamera
 from database import Database
 from audio import Reproductor
-
+from report import Report
 
 app = Flask(
     __name__,
@@ -28,9 +32,185 @@ app = Flask(
 socketio = SocketIO(app)
 
 db = Database()
+report = Report()
 audio = Reproductor()
 video = VideoCamera()
 video.set_mode("procesada")
+
+
+# FUNCION REPORT
+@app.route("/reporte", methods=["POST"])
+def reporte():
+
+    try:
+
+        data = request.get_json()
+        idUsuario = data.get("idUsuario")
+        usuario = db.get_user_data(idUsuario)
+        pruebas = db.fetch_test(idUsuario)
+
+        cedula = usuario[2]
+
+        print("pruebas: ", pruebas)
+        print("cedula: ", cedula)
+
+        fechaInforme = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        # Crear el PDF
+        pdf_filename = "static/reportes/reporte_" + fechaInforme + ".pdf"
+        c = canvas.Canvas(pdf_filename, pagesize=A4)
+        width, height = A4
+
+        # Agregar encabezado y datos del usuario en la primera página
+        report.add_page_header(
+            c,
+            "Reporte de Análisis de Superficie Plantar",
+            fechaInforme,
+        )
+        report.add_user_info(c, usuario)
+
+        y_position = height - 300
+        contador = 0
+
+        # Crear la ruta de la carpeta
+        carpeta_original = f"static/usuarios/{cedula}/fotos/original/"
+
+        # Contar archivos en la carpeta
+        cntImagenes = len(
+            [
+                nombre
+                for nombre in os.listdir(carpeta_original)
+                if os.path.isfile(os.path.join(carpeta_original, nombre))
+            ]
+        )
+
+        # Agregar datos de las pruebas
+        for prueba in pruebas:
+            contador += 1
+
+            if y_position < 300:  # Umbral para crear una nueva página
+                report.new_page(c)
+                y_position = (
+                    height - 50
+                )  # Iniciar en una posición más alta en las nuevas páginas
+
+            # Agregar fecha de la prueba
+            fecha_prueba = prueba[11]
+            c.setFont("Helvetica-Bold", 14)
+            c.drawString(50, y_position, f"Número de Prueba: {contador}")
+            c.drawString(50, y_position - 18, f"Fecha de la Prueba: {fecha_prueba}")
+            y_position -= 10
+
+            # Crear tabla de datos de la prueba, omitiendo el primer dato y los dos últimos
+            table_data = [
+                [
+                    "X",
+                    "Y",
+                    "Porcentaje\nIzquierda",
+                    "Tipo",
+                    "X",
+                    "Y",
+                    "Porcentaje\nDerecha",
+                    "Tipo",
+                ]
+            ]
+
+            prueba_datos = list(prueba[2:-2])
+
+            # Redondear columnas específicas (3, 4, 7, 8)
+            for i in [0, 1, 4, 5]:
+                prueba_datos[i] = str(round(float(prueba_datos[i]), 2)) + " cm"
+
+            c.setFont("Helvetica", 20)
+            table_data.append(prueba_datos)
+            report.add_table(c, table_data, 50, y_position - 70)
+            y_position -= 80
+
+            # Agregar segunda tabla con imágenes
+            table_data2 = [
+                ["Normal", "PseudoColor"],
+                [
+                    Image(
+                        "static/usuarios/"
+                        + cedula
+                        + "/fotos/procesada/"
+                        + str(cntImagenes)
+                        + "_imagen_normal.png",
+                        width=150,
+                        height=150,
+                    ),
+                    Image(
+                        "static/usuarios/"
+                        + cedula
+                        + "/fotos/procesada/"
+                        + str(cntImagenes)
+                        + "_imagen_pseudo.png",
+                        width=150,
+                        height=150,
+                    ),
+                ],
+            ]
+
+            if y_position < 300:  # Umbral para crear una nueva página
+                report.new_page(c)
+                y_position = height - 50
+
+            report.add_table(c, table_data2, 50, y_position - 200)
+            y_position -= 180
+
+            # Agregar tercera tabla con imágenes
+            table_data3 = [
+                ["Procesada", "Máscara"],
+                [
+                    Image(
+                        "static/usuarios/"
+                        + cedula
+                        + "/fotos/procesada/"
+                        + str(cntImagenes)
+                        + "_imagen_procesada.png",
+                        width=150,
+                        height=150,
+                    ),
+                    Image(
+                        "static/usuarios/"
+                        + cedula
+                        + "/fotos/procesada/"
+                        + str(cntImagenes)
+                        + "_imagen_mask.png",
+                        width=150,
+                        height=150,
+                    ),
+                ],
+            ]
+
+            if y_position < 300:  # Umbral para crear una nueva página
+                report.new_page(c)
+                y_position = height - 50
+
+            report.add_table(c, table_data3, 50, y_position - 200)
+            y_position -= 220
+
+        c.save()
+        print("PDF creado exitosamente:", pdf_filename)
+
+        # Obtener la ruta del directorio actual del script
+        current_dir = os.path.dirname(__file__)
+        # Construir la ruta completa al directorio de reportes
+        reportes_dir = os.path.join(current_dir, "static", "reportes")
+
+        # Construir la ruta completa al archivo PDF generado
+        pdf_filename = os.path.join(reportes_dir, "reporte_" + fechaInforme + ".pdf")
+        # Abrir el PDF automáticamente
+        if os.name == "nt":  # Para Windows
+            os.startfile(pdf_filename)
+
+        audio.play_reporte()
+
+        return jsonify({"status": "success"})
+
+    except Exception as err:
+        audio.play_error()
+        return jsonify({"status": "error", "message": str(err)})
 
 
 # FUNCION PAGINA PRINCIPAL
@@ -47,19 +227,33 @@ def index():
 def dashboard():
     if video.state():
         video.stop()
-
     # try:
     # Configuración de la conexión a la base de datos
     # db = Database(db_config)
-
     cuentaU = db.get_number_users()
     # db = Database(db_config)
     cuentaP = db.get_number_plantillas()
 
     cuentaT = db.get_number_tests()
 
+    # Crear la ruta de la carpeta
+    carpeta_reportes = f"static/reportes"
+
+    # Contar archivos en la carpeta
+    cntReportes = len(
+        [
+            nombre
+            for nombre in os.listdir(carpeta_reportes)
+            if os.path.isfile(os.path.join(carpeta_reportes, nombre))
+        ]
+    )
+
     return render_template(
-        "dashboard.html", cuentaU=cuentaU, cuentaP=cuentaP, cuentaT=cuentaT
+        "dashboard.html",
+        cuentaU=cuentaU,
+        cuentaP=cuentaP,
+        cuentaT=cuentaT,
+        reportes=cntReportes,
     )
 
 
@@ -206,7 +400,7 @@ def submitPlantilla():
         descripcion = request.form["nuevoDescripcion"]
         db.insert_pie(nombre, descripcion)
 
-        audio.play_registro()
+        # audio.play_registro()
         return jsonify({"status": "success"})
     # return redirect("/usuarios")
 
@@ -271,6 +465,8 @@ def set_guardar():
             id_plantilla_derecha,
             foto,
         )
+
+        audio.play_prueba()
         return jsonify({"status": "success"})
 
     except Exception as err:
@@ -304,6 +500,7 @@ def save_imagen_procesada():
                 if os.path.isfile(os.path.join(carpeta_original, nombre))
             ]
         )
+        contador = contador + 1
         # Crear el nombre del archivo con el contador
         nombre_fotoOriginal = f"{carpeta_original}{contador}_imagen_normal.png"
 

@@ -256,11 +256,17 @@ $(document).ready(function () {
 			}
 
 			if (data.txtBien == "MAL") {
-				$('#txtColocar').show()
+				//$('#txtColocar').show()
+				$('#txtColocar').css('background-color', 'red');
+				$('#texto_pies').text('COLOQUE BIEN LOS PIES');
+
 			}
 			if (data.txtBien == "BIEN") {
-				$('#txtColocar').hide()
+				//$('#txtColocar').hide()
+				$('#txtColocar').css('background-color', 'green');
+				$('#texto_pies').text('LOS PIES ESTAN BIEN COLOCADOS');
 			}
+
 
 			$('#xLeft').val(data.xLeft);
 			$('#yLeft').val(data.yLeft);

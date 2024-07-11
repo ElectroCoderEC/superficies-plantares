@@ -5,8 +5,8 @@ class Database:
     def __init__(self):
 
         db_config = {
-            "user": "android",
-            "password": "12345678",
+            "user": "root",
+            "password": "",
             "host": "localhost",
             "database": "pies",
         }
@@ -107,6 +107,15 @@ class Database:
         plantillas = cursor.fetchall()
         cursor.close()
         return plantillas
+
+    def fetch_test(self, idUsuario):
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM pruebas WHERE id_usuario = %s", (idUsuario,))
+        pruebas = cursor.fetchall()
+        cursor.close()
+        # self.connection.close()
+        return pruebas
 
     def get_user_data(self, id_cliente):
         self.connect()

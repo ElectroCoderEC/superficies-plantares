@@ -456,10 +456,26 @@
                                                 <div class="card user-card">
                                                     <div class="card-block">
                                                         <div class="row align-items-center">
+                                                            
+
+                                                                {% if reportes %}
+
                                                             <div class="col-8">
-                                                                <h1 class="text-c-blue">60+</h1>
-                                                               
+                                                                <h1 class="text-c-blue">{{reportes}}+</h1>
                                                             </div>
+   
+                                                            {% else %}
+
+                                                            <div class="col-8">
+                                                                <h1 class="text-c-blue">0</h1>
+                                                              
+                                                            </div>
+
+                                                            {% endif %}
+
+                                                              
+                                                               
+                                                           
                                                             <div class="col-4 text-right">
                                                                 <i class="fa fa-book f-28"></i>
                                                             </div>

@@ -282,3 +282,62 @@ $('#userForm input').on("change", function () {
 });
 
 
+
+
+
+/*=============================================
+ELIMINAR USUARIO
+=============================================*/
+$(".tablas").on("click", ".btnReporteUsuario", function () {
+
+	var idUsuario = $(this).attr("idUsuario");
+
+	Swal.fire({
+		title: '¿Crear reporte de las pruebas realizadas?',
+		text: "¡Si no lo está puede cancelar la accíón!",
+		type: 'warning',
+		showCancelButton: true,
+		confirmButtonColor: '#3085d6',
+		cancelButtonColor: '#d33',
+		cancelButtonText: 'Cancelar',
+		confirmButtonText: 'Si, crear!'
+	}).then(function (result) {
+
+		if (result) {
+
+
+			$.ajax({
+				url: '/reporte',
+				type: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify({ idUsuario: idUsuario }),
+				success: function (response) {
+
+
+					if (response.status == "success") {
+						Swal.fire(
+							'¡PDF creado!',
+							'El reporte se ha creado correctamente',
+							'success'
+						).then(() => {
+							// Recargar la página para actualizar la lista de usuarios
+							//location.reload();
+						});
+					}
+
+
+				},
+				error: function (xhr, status, error) {
+					Swal.fire(
+						'Error',
+						'Hubo un problema al crear el reporte.',
+						'error'
+					);
+				}
+			});
+
+		}
+
+	})
+
+})

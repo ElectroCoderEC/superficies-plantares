@@ -6,6 +6,8 @@ audio_bien = "static/sonidos/bien.mp3"
 audio_coloquese = "static/sonidos/coloquese.mp3"
 audio_medicion = "static/sonidos/medicion.mp3"
 audio_error = "static/sonidos/error.mp3"
+audio_prueba = "static/sonidos/prueba.mp3"
+audio_reporte = "static/sonidos/reporte.mp3"
 
 
 class Reproductor:
@@ -41,6 +43,16 @@ class Reproductor:
     def play_registro(self):
         mixer.init()
         mixer.music.load(audio_registro)
+        mixer.music.play()
+
+    def play_prueba(self):
+        mixer.init()
+        mixer.music.load(audio_prueba)
+        mixer.music.play()
+
+    def play_reporte(self):
+        mixer.init()
+        mixer.music.load(audio_reporte)
         mixer.music.play()
 
     def play_error(self):

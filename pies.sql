@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 11-07-2024 a las 07:42:27
+-- Tiempo de generación: 11-07-2024 a las 22:00:26
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.0.28
 
@@ -102,7 +102,10 @@ CREATE TABLE `pruebas` (
 --
 
 INSERT INTO `pruebas` (`id`, `id_usuario`, `x_izquierdo`, `y_izquierdo`, `porcentaje_izquierda`, `id_plantilla_izquierda`, `x_derecha`, `y_derecha`, `porcentaje_derecha`, `id_plantilla_derecha`, `foto`, `fecha`) VALUES
-(2, 20, '6.84328797', '3.36883729', '51%', 'Pie normal', '6.46430939', '4.16622047', '64%', 'Pie cavo', 'static/usuarios/0604655654/fotos/procesada/1_imagen_procesada.png', '2024-07-11 05:41:26');
+(5, 20, '6.84328797', '3.36883729', '51%', 'Pie normal', '6.46430939', '4.16622047', '64%', 'Pie cavo', 'static/usuarios/0604655654/fotos/procesada/4_imagen_procesada.png', '2024-07-11 18:11:00'),
+(6, 20, '6.84328797', '3.36883729', '51%', 'Pie normal', '6.46430939', '4.16622047', '64%', 'Pie cavo', 'static/usuarios/0604655654/fotos/procesada/1_imagen_procesada.png', '2024-07-11 18:12:03'),
+(7, 20, '6.84328797', '3.36883729', '51%', 'Pie normal', '6.46430939', '4.16622047', '64%', 'Pie cavo', 'static/usuarios/0604655654/fotos/procesada/2_imagen_procesada.png', '2024-07-11 18:16:20'),
+(8, 20, '6.84328797', '3.36883729', '51%', 'Pie normal', '6.46430939', '4.16622047', '64%', 'Pie cavo', 'static/usuarios/0604655654/fotos/procesada/3_imagen_procesada.png', '2024-07-11 19:05:34');
 
 -- --------------------------------------------------------
 
@@ -166,7 +169,7 @@ ALTER TABLE `plantillas`
 -- AUTO_INCREMENT de la tabla `pruebas`
 --
 ALTER TABLE `pruebas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
