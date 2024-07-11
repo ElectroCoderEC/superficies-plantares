@@ -11,6 +11,7 @@ from flask_socketio import SocketIO, emit
 import cv2
 from werkzeug.utils import secure_filename
 import json
+from datetime import datetime
 
 # CLASES CREADAS PROPIAS **************************************
 from camera import VideoCamera
@@ -53,11 +54,13 @@ def dashboard():
 
     cuentaU = db.get_number_users()
     # db = Database(db_config)
-
     cuentaP = db.get_number_plantillas()
-    print("datooo", cuentaP)
 
-    return render_template("dashboard.html", cuentaU=cuentaU, cuentaP=cuentaP)
+    cuentaT = db.get_number_tests()
+
+    return render_template(
+        "dashboard.html", cuentaU=cuentaU, cuentaP=cuentaP, cuentaT=cuentaT
+    )
 
 
 # except Exception as e:
@@ -212,6 +215,120 @@ def submitPlantilla():
         return jsonify({"status": "error", "message": str(err)})
 
 
+def tipoPie(tipo):
+
+    if tipo == "plano":
+        numero = "1"
+    elif tipo == "plano normal":
+        numero = "2"
+    elif tipo == "plano":
+        numero = "3"
+    elif tipo == "normal cavo":
+        numero = "4"
+    elif tipo == "cavo":
+        numero = "5"
+    elif tipo == "cavo fuerte":
+        numero = "6"
+    elif tipo == "cavo extremo":
+        numero = "7"
+    else:
+        numero = "0"
+
+    return numero
+
+
+@app.route("/set_guardar", methods=["POST"])
+def set_guardar():
+    try:
+        data = request.get_json()
+
+        txtizquierda = data["tipoIzquierdo"]
+        id_izquierda = tipoPie(txtizquierda.lower())
+
+        txtderecha = data["tipoDerecho"]
+        id_derecha = tipoPie(txtderecha.lower())
+
+        id_usuario = data["idUsuario"]
+        x_izquierdo = data["xI"]
+        y_izquierdo = data["yI"]
+        porcentaje_izquierda = data["valorIzquierdo"]
+        id_plantilla_izquierda = txtizquierda
+        x_derecha = data["xD"]
+        y_derecha = data["yD"]
+        porcentaje_derecha = data["valorDerecho"]
+        id_plantilla_derecha = txtderecha
+        foto = data["foto"]
+
+        db.insert_prueba(
+            id_usuario,
+            x_izquierdo,
+            y_izquierdo,
+            porcentaje_izquierda,
+            id_plantilla_izquierda,
+            x_derecha,
+            y_derecha,
+            porcentaje_derecha,
+            id_plantilla_derecha,
+            foto,
+        )
+        return jsonify({"status": "success"})
+
+    except Exception as err:
+        audio.play_error()
+        return jsonify({"status": "error", "message": str(err)})
+
+
+@app.route("/save_imagen_procesada", methods=["POST"])
+def save_imagen_procesada():
+    try:
+        data = request.get_json()
+        cedula = data["cedula"]
+        imagen_normal, imagen_mask, imagen_pseudo, imagen_procesada = video.get_images()
+        # Crear la ruta de la carpeta
+        carpeta = f"static/usuarios/{cedula}/fotos/procesada/"
+        carpeta_original = f"static/usuarios/{cedula}/fotos/original/"
+
+        # Asegurarse de que la carpeta existe
+        if not os.path.exists(carpeta):
+            os.makedirs(carpeta)
+
+        # Asegurarse de que la carpeta existe
+        if not os.path.exists(carpeta_original):
+            os.makedirs(carpeta_original)
+
+        # Contar archivos en la carpeta
+        contador = len(
+            [
+                nombre
+                for nombre in os.listdir(carpeta_original)
+                if os.path.isfile(os.path.join(carpeta_original, nombre))
+            ]
+        )
+        # Crear el nombre del archivo con el contador
+        nombre_fotoOriginal = f"{carpeta_original}{contador}_imagen_normal.png"
+
+        nombre_archivo1 = f"{carpeta}{contador}_imagen_normal.png"
+        nombre_archivo2 = f"{carpeta}{contador}_imagen_mask.png"
+        nombre_archivo3 = f"{carpeta}{contador}_imagen_pseudo.png"
+        nombre_archivo4 = f"{carpeta}{contador}_imagen_procesada.png"
+
+        # Guardar la imagen
+        cv2.imwrite(nombre_fotoOriginal, imagen_normal)
+
+        cv2.imwrite(nombre_archivo1, imagen_normal)
+        cv2.imwrite(nombre_archivo2, imagen_mask)
+        cv2.imwrite(nombre_archivo3, imagen_pseudo)
+        cv2.imwrite(nombre_archivo4, imagen_procesada)
+
+        return jsonify(
+            {"status": "success", "carpeta": carpeta, "foto": nombre_archivo4}
+        )
+
+    except Exception as err:
+        audio.play_error()
+        return jsonify({"status": "error", "message": str(err)})
+
+
 @app.route("/select_user", methods=["POST"])
 def select_user():
     data = request.get_json()
@@ -266,9 +383,18 @@ def video_stream(camera):
         video.start()
 
     while True:
-        frame, valorIzquierda, valorDerecha, tipoIzquierda, tipoDerecha, txtBien = (
-            camera.get_frame()
-        )
+        (
+            frame,
+            valorIzquierda,
+            valorDerecha,
+            tipoIzquierda,
+            tipoDerecha,
+            txtBien,
+            xIzquierda,
+            yIzquierda,
+            xDerecha,
+            yDerecha,
+        ) = camera.get_frame()
         socketio.emit(
             "status_update",
             {
@@ -277,6 +403,10 @@ def video_stream(camera):
                 "Tizquierdo": tipoIzquierda,
                 "Tderecho": tipoDerecha,
                 "txtBien": txtBien,
+                "xLeft": xIzquierda,
+                "yLeft": yIzquierda,
+                "xRight": xDerecha,
+                "yRight": yDerecha,
             },
         )
         # socketio.sleep(0.1)
@@ -387,6 +517,36 @@ def get_hsv():
         variables = db.fetch_configuraciones()
         socketio.emit("status_hsv", {"variables": variables})
         return jsonify({"status": "success"})
+
+    except Exception as err:
+        audio.play_error()
+        return jsonify({"status": "error", "message": str(err)})
+
+
+@app.route("/update_plantilla", methods=["POST"])
+def update_plantilla():
+
+    try:
+        id = request.form["idPlantilla"]
+        nombre = request.form["editarPlantilla"]
+        descripcion = request.form["editarDescripcion"]
+
+        db.update_plantilla(id, nombre, descripcion)
+        return jsonify({"status": "success"})
+
+    except Exception as err:
+        audio.play_error()
+        return jsonify({"status": "error", "message": str(err)})
+
+
+@app.route("/get_plantilla", methods=["POST"])
+def get_plantilla():
+
+    try:
+        data = request.get_json()
+        id = data.get("idPlantilla")
+        datos = db.get_plantilla(id)
+        return jsonify({"status": "success", "plantilla": datos})
 
     except Exception as err:
         audio.play_error()

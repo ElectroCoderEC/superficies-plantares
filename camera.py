@@ -21,6 +21,12 @@ PORC2 = "---"
 TIPO1 = ""
 TIPO2 = ""
 
+xLeft = "0"
+yLeft = "0"
+xRight = "0"
+yRight = "0"
+
+
 pseudo_color = None
 colocarBien = ""
 
@@ -28,6 +34,11 @@ capturar = False
 reproducir = True
 guardar = False
 check = False
+
+imagen_normal = None
+imagen_mask = None
+imagen_pseudo = None
+imagen_procesada = None
 
 
 # Función para calcular los puntos de una línea perpendicular
@@ -179,8 +190,10 @@ def categorizar_pie(porcentaje):
         return "normal cavo"
     elif porcentaje >= 60 and porcentaje <= 74:
         return "cavo"
-    elif porcentaje >= 75 and porcentaje <= 100:
+    elif porcentaje >= 75 and porcentaje <= 84:
         return "cavo fuerte"
+    elif porcentaje >= 85 and porcentaje <= 100:
+        return "cavo extremo"
     else:
         return "Porcentaje fuera de rango"
 
@@ -188,7 +201,7 @@ def categorizar_pie(porcentaje):
 def detectar_contornos_planta(
     framed, lower_bound, upper_bound, lower_bound2, upper_bound2
 ):
-    global malcolocado, pseudo_color, PORC1, PORC2, TIPO1, TIPO2, colocarBien
+    global malcolocado, pseudo_color, PORC1, PORC2, TIPO1, TIPO2, colocarBien, xLeft, yLeft, xRight, yRight
 
     try:
         #           DETECCION DE PLANTA
@@ -586,6 +599,9 @@ def detectar_contornos_planta(
                         textx = "X: {:.1f}".format(Xcm)
                         # TIPO DE PIE
                         PIE_IZQUIERDO = ((Xcm - Ycm) / Xcm) * 100
+                        xLeft = str(Xcm)
+                        yLeft = str(Ycm)
+
                         izquierdo_porc = "%: {:.1f}".format(PIE_IZQUIERDO)
                         TIPO1 = categorizar_pie(PIE_IZQUIERDO)
                         PORC1 = PIE_IZQUIERDO
@@ -866,6 +882,9 @@ def detectar_contornos_planta(
                         PIE_DERECHO = ((Xcm2 - Ycm2) / Xcm2) * 100
                         PIE_DERECHO = abs(100 - PIE_DERECHO)
                         derecho_porc = "%: {:.1f}".format(PIE_DERECHO)
+
+                        xRight = str(Xcm2)
+                        yRight = str(Ycm2)
                         TIPO2 = categorizar_pie(PIE_DERECHO)
                         PORC2 = PIE_DERECHO
                         print(TIPO2)
@@ -1090,7 +1109,7 @@ def procesamiento(
     upper_v2,
 ):
 
-    global capturar, reproducir, colocarBien, check
+    global capturar, reproducir, colocarBien, check, xLeft, yLeft, xRight, yRight, imagen_normal, imagen_mask, imagen_pseudo, imagen_procesada
     # DESCOMENTAR PARA Q FUNCIONE CAMARA
 
     # DESCOMENTAR PARA Q FUNCIONE IMAGEN
@@ -1158,25 +1177,85 @@ def procesamiento(
             frame, lower_bound, upper_bound, lower_bound2, upper_bound2
         )
 
+        imagen_normal = frame
+        imagen_mask = mask1
+        imagen_pseudo = pseudo
+        imagen_procesada = planta   
+
         # cv2.imshow('Detectar mask', mask1)
         # cv2.imshow('COMPENSADA', planta)
         # cv2.imshow('ORIGINAL', original)
 
         if camera_mode == "procesada":
-            return planta, porcI, porcD, tipoI, tipoD, colocarBien
+            return (
+                planta,
+                porcI,
+                porcD,
+                tipoI,
+                tipoD,
+                colocarBien,
+                xLeft,
+                yLeft,
+                xRight,
+                yRight,
+            )
         elif camera_mode == "mascara":
-            return mask1, porcI, porcD, tipoI, tipoD, colocarBien
+            return (
+                mask1,
+                porcI,
+                porcD,
+                tipoI,
+                tipoD,
+                colocarBien,
+                xLeft,
+                yLeft,
+                xRight,
+                yRight,
+            )
         elif camera_mode == "pseudo":
-            return pseudo, porcI, porcD, tipoI, tipoD, colocarBien
+            return (
+                pseudo,
+                porcI,
+                porcD,
+                tipoI,
+                tipoD,
+                colocarBien,
+                xLeft,
+                yLeft,
+                xRight,
+                yRight,
+            )
         else:
-            return frame, porcI, porcD, tipoI, tipoD, colocarBien
+            return (
+                frame,
+                porcI,
+                porcD,
+                tipoI,
+                tipoD,
+                colocarBien,
+                xLeft,
+                yLeft,
+                xRight,
+                yRight,
+            )
 
     # cv2.imshow('Imagen Pseudo Color', pseudo_color)
     except Exception as e:
         print("sin camara:")
         print(e)
         frame = mostrar_mensaje_sin_camara()
-        return frame, porcI, porcD, tipoI, tipoD, colocarBien
+        return (
+            frame,
+            porcI,
+            porcD,
+            tipoI,
+            tipoD,
+            colocarBien,
+            xLeft,
+            yLeft,
+            xRight,
+            yRight,
+        )
         # cv2.imshow('Detectar Contornos pies', frame)
 
         # Salir del bucle si se presiona la tecla 'q'
@@ -1213,13 +1292,18 @@ class VideoCamera(object):
         self.tipoDerecha = ""
         self.colocarBien = ""
 
+        self.xIzquierda = "0"
+        self.yIzquierda = "0"
+        self.xDerecha = "0"
+        self.yDerecha = "0"
+
     def start(self):
         self.stateCam = True
         # Abrir la camara rapido con CAP_DSHOW
         self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-        #self.cap.set(10, 150)
+        # self.cap.set(10, 150)
         self.cap.set(28, 0)
 
     def stop(self):
@@ -1297,6 +1381,10 @@ class VideoCamera(object):
         elif estado == "False":
             check = False
 
+    def get_images(self):
+        global imagen_normal, imagen_mask, imagen_pseudo, imagen_procesada
+        return imagen_normal, imagen_mask, imagen_pseudo, imagen_procesada
+
     def get_frame(self):
         success, image = self.cap.read()
         # image=cv2.resize(image,(840,640))
@@ -1308,6 +1396,10 @@ class VideoCamera(object):
                 self.tipoIzquierda,
                 self.tipoDerecha,
                 self.colocarBien,
+                self.xIzquierda,
+                self.yIzquierda,
+                self.xDerecha,
+                self.yDerecha,
             ) = procesamiento(
                 image,
                 self.camera_mode,
@@ -1333,4 +1425,8 @@ class VideoCamera(object):
             self.tipoIzquierda,
             self.tipoDerecha,
             self.colocarBien,
+            self.xIzquierda,
+            self.yIzquierda,
+            self.xDerecha,
+            self.yDerecha,
         )

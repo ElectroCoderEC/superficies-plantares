@@ -255,16 +255,17 @@ $(document).ready(function () {
 				$('#tipoDerecho').text("Pie " + data.Tderecho);
 			}
 
-
-
-
-
 			if (data.txtBien == "MAL") {
 				$('#txtColocar').show()
 			}
 			if (data.txtBien == "BIEN") {
 				$('#txtColocar').hide()
 			}
+
+			$('#xLeft').val(data.xLeft);
+			$('#yLeft').val(data.yLeft);
+			$('#xRight').val(data.xRight);
+			$('#yRight').val(data.yRight);
 
 
 		}
@@ -312,13 +313,11 @@ $(document).ready(function () {
 
 
 	$('#siImagen').click(function () {
-
 		var estadoCheck = "False"
 
 		if ($(this).is(':checked') == true) {
 			//alert(estadoCheck);
 			estadoCheck = "True"
-
 		} else {
 			//alert(estadoCheck);
 			estadoCheck = "False"
@@ -339,8 +338,6 @@ $(document).ready(function () {
 
 
 	$('#btnCapturar').click(function () {
-
-
 		$.ajax({
 			url: '/set_imagen',
 			method: 'POST',
@@ -355,9 +352,6 @@ $(document).ready(function () {
 
 
 	$('#btnReproducir').click(function () {
-
-
-
 		$.ajax({
 			url: '/set_imagen',
 			method: 'POST',
@@ -372,6 +366,24 @@ $(document).ready(function () {
 
 
 	$('#btnGuardar').click(function () {
+
+		var cedula = $('#formCedula').text();
+		var rutaFoto = ""
+
+		$.ajax({
+			url: '/save_imagen_procesada',
+			method: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify({ cedula: cedula }),
+			success: function (response) {
+				// Puedes manejar la respuesta si es necesario
+				console.log(response.message);
+				rutaFoto = response.foto;
+
+			}
+		});
+
+
 
 		Swal.fire({
 			title: '¿Está seguro que deseas guardar esta prueba?',
@@ -390,7 +402,18 @@ $(document).ready(function () {
 					url: '/set_guardar',
 					type: 'POST',
 					contentType: 'application/json',
-					data: JSON.stringify({ estado: "ON" }),
+					data: JSON.stringify({
+						"idUsuario": $('#formID').val(),
+						"xI": $('#xLeft').val(),
+						"yI": $('#yLeft').val(),
+						"valorIzquierdo": $('#valorIzquierdo').text(),
+						"tipoIzquierdo": $('#tipoIzquierdo').text(),
+						"xD": $('#xRight').val(),
+						"yD": $('#yRight').val(),
+						"valorDerecho": $('#valorDerecho').text(),
+						"tipoDerecho": $('#tipoDerecho').text(),
+						"foto": rutaFoto,
+					}),
 					success: function (response) {
 
 						if (response.status == "success") {
@@ -410,9 +433,6 @@ $(document).ready(function () {
 								'error'
 							);
 						}
-
-
-
 					},
 					error: function (xhr, status, error) {
 						Swal.fire(
@@ -422,16 +442,8 @@ $(document).ready(function () {
 						);
 					}
 				});
-
 			}
-
 		})
-
-
-
-
-
-
 	});
 
 

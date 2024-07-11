@@ -514,6 +514,11 @@
                                                         
                                                     </div>
 
+                                                    <input type="hidden"  name="xLeft" id="xLeft">
+                                                    <input type="hidden"  name="yLeft" id="yLeft">
+                                                    <input type="hidden"  name="xRight" id="xRight">
+                                                    <input type="hidden"  name="yRight" id="yRight">
+
                                                     <div id="txtColocar" class="card-body text-center" style="background-color: red; color: white;">
                                                         <h5>COLOQUE BIEN LOS PIES</h5>
                                                     </div>
@@ -601,10 +606,12 @@
                                                     <div class="card-body  text-center">
                                                         <div class="">
                                                             <img src="{{ usuario[8] }}" class="img-radius " alt="User-Profile-Image" style="width: 30%;">
+
+                                                            <input type="hidden" id="formID" value="{{ usuario[0] }}" >
                                                         </div>
 
-                                                        <h5 class="f-w-600 m-t-25 m-b-10">{{ usuario[1] }}</h5>
-                                                        <p>{{ usuario[2] }}</p>
+                                                        <h5 class="f-w-600 m-t-25 m-b-10" >{{ usuario[1] }}</h5>
+                                                        <p id="formCedula">{{ usuario[2] }}</p>
                                                        
                                                         
                                                         <div class="bg-c-blue counter-block m-t-10 p-20">

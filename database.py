@@ -48,6 +48,40 @@ class Database:
         cursor.close()
         # self.connection.close()
 
+    def insert_prueba(
+        self,
+        id_usuario,
+        x_izquierdo,
+        y_izquierdo,
+        porcentaje_izquierda,
+        id_plantilla_izquierda,
+        x_derecha,
+        y_derecha,
+        porcentaje_derecha,
+        id_plantilla_derecha,
+        foto,
+    ):
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "INSERT INTO pruebas (id_usuario, x_izquierdo, y_izquierdo, porcentaje_izquierda, id_plantilla_izquierda, x_derecha, y_derecha, porcentaje_derecha, id_plantilla_derecha, foto) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (
+                id_usuario,
+                x_izquierdo,
+                y_izquierdo,
+                porcentaje_izquierda,
+                id_plantilla_izquierda,
+                x_derecha,
+                y_derecha,
+                porcentaje_derecha,
+                id_plantilla_derecha,
+                foto,
+            ),
+        )
+        self.connection.commit()
+        cursor.close()
+        # self.connection.close()
+
     def fetch_users(self):
         self.connect()
         cursor = self.connection.cursor()
@@ -60,7 +94,7 @@ class Database:
     def fetch_plantillas(self):
         self.connect()
         cursor = self.connection.cursor()
-        cursor.execute("SELECT * FROM plantillas order by id DESC")
+        cursor.execute("SELECT * FROM plantillas order by id ASC")
         plantillas = cursor.fetchall()
         cursor.close()
         # self.connection.close()
@@ -126,6 +160,38 @@ class Database:
         cursor.close()
         # self.connection.close()
         return count[0]
+
+    def get_number_tests(self):
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT COUNT(id) FROM pruebas")
+        count = cursor.fetchone()
+        cursor.close()
+        # self.connection.close()
+        return count[0]
+
+    def update_plantilla(self, id, nombre, descripcion):
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute(
+            "UPDATE plantillas SET nombre = %s,descripcion = %s  WHERE id = %s",
+            (
+                nombre,
+                descripcion,
+                id,
+            ),
+        )
+        self.connection.commit()
+        cursor.close()
+
+    def get_plantilla(self, id_plantilla):
+        self.connect()
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM plantillas WHERE id = %s", (id_plantilla,))
+        user = cursor.fetchone()
+        cursor.close()
+        # self.connection.close()
+        return user
 
     def update_hsv(
         self,

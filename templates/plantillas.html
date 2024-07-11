@@ -376,6 +376,7 @@
                                                         <thead  >
                                                             <tr>
                                                                 <th>Nº</th>
+                                                                
                                                                 <th>Nombre Plantilla</th>
                                                                 <th>Descripción</th>
                                                                 <th>Fecha</th> 
@@ -393,7 +394,7 @@
                                                                   <td>{{ planta[3] }}</td>
                                                                   
                                                                   <td> 
-                                                                    <button class="btn waves-effect waves-light  btn-warning btn-icon btnModificarPlantilla"  idPlantilla="{{ planta[0]}}" title="Editar"><i class="fa fa-pencil"></i></button>
+                                                                    <button class="btn waves-effect waves-light  btn-warning btn-icon btnModificarPlantilla"  idPlantilla="{{ planta[0]}}" title="Editar" data-toggle="modal" data-target="#modalEditarPlantilla"><i class="fa fa-pencil"></i></button>
                                                                     <button class="btn waves-effect waves-light  btn-danger  btn-icon btnEliminarPlantilla"  idPlantilla=" {{ planta[0]}}" title="Borrar"><i class="fa fa-times"></i></button>
                                                                   </td>
 
@@ -448,19 +449,11 @@ MODAL AGREGAR PLANTILLA
   
           <!--=====================================
           CUERPO DEL MODAL
-          ======================================-->
-          
-         
-
-           
+          ======================================-->           
                 <div class="modal-body" >
-
-
   
                     <div class="box-body">
-          
-                     
-                 
+
                         <!-- ENTRADA PARA EL NOMBRE -->
                        
                             <div class="form-group">
@@ -484,10 +477,6 @@ MODAL AGREGAR PLANTILLA
                                   <textarea type="text" class="form-control " placeholder="Describir las caracteristicas de esta plantilla" name="nuevoDescripcion" id="nuevoDescripcion"  required></textarea>
                                 </div>
                               </div>
-                         
-        
-                     
-        
         
                     </div>
           
@@ -503,6 +492,99 @@ MODAL AGREGAR PLANTILLA
             <button type="button" class="btn btn-danger pull-left " data-dismiss="modal">Salir</button>
   
             <button type="submit" class="btn btn-primary " >Guardar plantilla</button>
+  
+          </div>
+  
+        </form>
+  
+      </div>
+    </div>
+  </div>
+
+
+
+  
+    <!--=====================================
+MODAL EDITAR PLANTILLA
+======================================-->
+
+<div id="modalEditarPlantilla" class="modal fade" role="dialog">
+  
+    <div class="modal-dialog">
+  
+      <div class="modal-content" >
+  
+        <form role="form"  id="userFormEditar" action="/update_plantilla" method="post" enctype="multipart/form-data">
+  
+          <!--=====================================
+          CABEZA DEL MODAL
+          ======================================-->
+  
+          <div class="modal-header btn-primary">
+           
+
+                <div >
+                    <h5 class="modal-title">Editar Tipo de Superficie Plantar</h5>
+                </div>
+            
+          </div>
+  
+          <!--=====================================
+          CUERPO DEL MODAL
+          ======================================-->
+          
+         
+
+           
+                <div class="modal-body" >
+
+
+  
+                    <div class="box-body">
+          
+                     
+                 
+                        <!-- ENTRADA PARA EL NOMBRE -->
+                       
+                            <div class="form-group">
+                                <b><label for="nombre"><i class="icon-user"></i>Tipo de pie</label></b>
+            
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-user"></i></span>         
+                                    <input type="text" class="form-control form-control-round" name="editarPlantilla" id="editarPlantilla"  required>
+                                </div>
+                            </div>
+                        
+                          
+            
+                        <!-- ENTRADA PARA CEDULA -->
+                         
+                            <div class="form-group">
+                                <b><label for="descripcion"><i class="icon-lock"></i>Descripción</label> <b></b>
+            
+                                <div class="input-group">
+                                  <span class="input-group-addon"><i class="fa fa-address-card"></i></span> 
+                                  <textarea type="text" class="form-control " placeholder="Describir las caracteristicas de esta plantilla" name="editarDescripcion" id="editarDescripcion"  required></textarea>
+                                </div>
+                              </div>
+                         
+                              <input type="hidden"  name="idPlantilla" id="idPlantilla">
+                          
+        
+                    </div>
+          
+                </div>
+      
+  
+          <!--=====================================
+          PIE DEL MODAL
+          ======================================-->
+  
+          <div class="modal-footer">
+  
+            <button type="button" class="btn btn-danger pull-left " data-dismiss="modal">Salir</button>
+  
+            <button type="submit" class="btn btn-primary " >Editar plantilla</button>
   
           </div>
   
@@ -612,6 +694,53 @@ MODAL AGREGAR PLANTILLA
               Swal.fire({
                 title: 'Error!',
                 text: 'Ocurrió un error al guardar los datos: ' + data.message,
+                icon: 'error',
+                confirmButtonColor: '#3393FF'
+              });
+            }
+          })
+          .catch(error => {
+            Swal.fire({
+              title: 'Error!',
+              text: 'Ocurrió un error inesperado.',
+              icon: 'error',
+              confirmButtonColor: '#3393FF'
+            });
+          });
+        });
+
+
+
+        document.getElementById('userFormEditar').addEventListener('submit', function(event) {
+          event.preventDefault();
+
+          $('#modalEditarPlantilla').modal('hide'); // Cierra el modal
+
+          var formData = new FormData(this);
+  
+          fetch('/update_plantilla', {
+            method: 'POST',
+            body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+
+              Swal.fire({
+                title: 'GENIAL!',
+                text: '¡La plantilla ha sido editada correctamente!',
+                icon: 'success',
+                confirmButtonColor: '#3393FF'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                 
+                  window.location.href = "/plantillas"; // Redirigir a la lista de usuarios
+                }
+              });
+            } else {
+              Swal.fire({
+                title: 'Error!',
+                text: 'Ocurrió un error al editar los datos: ' + data.message,
                 icon: 'error',
                 confirmButtonColor: '#3393FF'
               });

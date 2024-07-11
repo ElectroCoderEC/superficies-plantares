@@ -379,7 +379,20 @@
                                                     <div class="card-block">
                                                         <div class="row align-items-center">
                                                             <div class="col-8">
-                                                                <h1 class="text-c-green">50+</h1>
+                                                               
+                                                                {% if cuentaT %}
+
+                                                                <div class="col-8">
+                                                                    <h1 class="text-c-green">{{cuentaT}}+</h1>
+                                                                </div>
+    
+                                                                {% else %}
+
+                                                                <div class="col-8">
+                                                                    <h1 class="text-c-green">0</h1>
+                                                                </div>
+
+                                                                {% endif %}
                                                           
                                                             </div>
                                                             <div class="col-4 text-right">

@@ -1,51 +1,40 @@
 
 /*=============================================
-EDITAR USUARIO
+EDITAR PLANTILLA
 =============================================*/
-$(".tablas").on("click", ".btnEditarPlantilla", function () {
+$(".tablas").on("click", ".btnModificarPlantilla", function () {
 
-	var idUsuario = $(this).attr("idPlantilla");
+	var idPlantilla = $(this).attr("idPlantilla");
 
-	var datos = new FormData();
-	datos.append("idUsuario", idUsuario);
 
 	$.ajax({
+		url: '/get_plantilla',
+		type: 'POST',
+		contentType: 'application/json',
+		data: JSON.stringify({ idPlantilla: idPlantilla }),
+		success: function (response) {
+			var datos = response.plantilla[0]; // Acceder a la primera fila de resultados
 
-		url: "ajax/usuarios.ajax.php",
-		method: "POST",
-		data: datos,
-		cache: false,
-		contentType: false,
-		processData: false,
-		dataType: "json",
-		success: function (respuesta) {
-
-			$("#editarNombre").val(respuesta["nombre"]);
-			$("#editarUsuario").val(respuesta["usuario"]);
-			$("#editarPerfil").html(respuesta["perfil"]);
-			$("#editarPerfil").val(respuesta["perfil"]);
-			$("#fotoActual").val(respuesta["foto"]);
-
-			$("#passwordActual").val(respuesta["password"]);
-
-			if (respuesta["foto"] != "") {
-
-				$(".previsualizarEditar").attr("src", respuesta["foto"]);
-
-			} else {
-
-				$(".previsualizarEditar").attr("src", "vistas/img/usuarios/default/anonymous.png");
-
-			}
-
+			$("#idPlantilla").val(response.plantilla[0]);
+			$("#editarPlantilla").val(response.plantilla[1]);
+			$("#editarDescripcion").val(response.plantilla[2]);
+		},
+		error: function (xhr, status, error) {
+			Swal.fire(
+				'Error',
+				'Hubo un problema al borrar este dato.',
+				'error'
+			);
 		}
-
 	});
+
+
 
 })
 
+
 /*=============================================
-ELIMINAR USUARIO
+ELIMINAR PLANTILLA
 =============================================*/
 $(".tablas").on("click", ".btnEliminarPlantilla", function () {
 
