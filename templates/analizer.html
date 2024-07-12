@@ -496,10 +496,18 @@
                                                             </div>
 
                                                             <div class="col-4">
-
+                                                                    
                                                                
+                                                                {% if check %}
+                                                                <input type="checkbox" id="siImagen" name="siImagen" checked>
+                                                                <label for="siImagen"> ¿Nueva Imagen?</label>
+                                                               
+                                                                {% else %}
                                                                 <input type="checkbox" id="siImagen" name="siImagen" value="">
                                                                 <label for="siImagen"> ¿Nueva Imagen?</label>
+
+                                                                {% endif %}
+
                                                                        
                                                                        
                                                                         

@@ -1394,6 +1394,10 @@ class VideoCamera(object):
         elif estado == "False":
             check = False
 
+    def get_check(self):
+        global check
+        return check
+
     def get_images(self):
         global imagen_normal, imagen_mask, imagen_pseudo, imagen_procesada
         return imagen_normal, imagen_mask, imagen_pseudo, imagen_procesada

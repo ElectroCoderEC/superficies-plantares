@@ -309,7 +309,11 @@ def analyzer():
     usuario = request.args.get("usuario")
     usuario = json.loads(usuario)
     variables = db.fetch_configuraciones()
-    return render_template("analizer.html", usuario=usuario, variables=variables)
+    check = video.get_check()
+    if(check):
+        return render_template("analizer.html", usuario=usuario, variables=variables, check=check)
+    else:
+        return render_template("analizer.html", usuario=usuario, variables=variables)
 
 
 # Ruta para manejar el envío del formulario
